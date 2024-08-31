@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { getUsers } from '../../services/userService'; // Adjust the path to your service file
+import React, { useState, useEffect } from "react";
+import { StyleSheet, Text, View, FlatList, Image } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { getUsers } from "../../services/userService"; // Adjust the path to your service file
 
 const Profile = () => {
   const [users, setUsers] = useState([]);
@@ -14,7 +14,7 @@ const Profile = () => {
         const data = await getUsers();
         setUsers(data);
       } catch (error) {
-        setError('Error fetching users');
+        setError("Error fetching users");
       } finally {
         setLoading(false);
       }
@@ -46,9 +46,25 @@ const Profile = () => {
           data={users}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <View className="p-4 mb-2 bg-white rounded shadow">
-              <Text className="text-lg font-semibold">{item.name}</Text>
-              <Text className="text-gray-600">{item.email}</Text>
+            <View className="p-4 mb-4 bg-accent rounded-lg shadow-lg">
+              <Text className="text-dark font-abold text-lg mb-2">
+                {item.username}
+              </Text>
+              <Text className="text-secondary mb-1">
+                Name: {item.first_name} {item.last_name}
+              </Text>
+              <Image
+                source={{ uri: `data:image/jpeg;base64,${item.profile_img}` }}
+                className="w-16 h-16 rounded-full mb-2"
+              />
+              <Text className="text-secondary mb-1">Email: {item.email}</Text>
+              <Text className="text-secondary mb-1">Password: ••••••••</Text>
+              <Text className="text-secondary mb-1">
+                Created At: {item.created_at}
+              </Text>
+              <Text className="text-secondary">
+                Updated At: {item.updated_at}
+              </Text>
             </View>
           )}
         />

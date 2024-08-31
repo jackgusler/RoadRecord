@@ -10,7 +10,12 @@ class UserController extends Controller
     // Get all users
     public function index()
     {
-        $users = User::all();
+        $users = User::all()->map(function ($user) {
+            if ($user->profile_img) {
+                $user->profile_img = base64_encode($user->profile_img);
+            }
+            return $user;
+        });
         return response()->json($users);
     }
 
@@ -19,6 +24,9 @@ class UserController extends Controller
     {
         $user = User::find($id);
         if ($user) {
+            if ($user->profile_img) {
+                $user->profile_img = base64_encode($user->profile_img);
+            }
             return response()->json($user);
         } else {
             return response()->json([
@@ -36,11 +44,20 @@ class UserController extends Controller
             'password' => 'required|min:6',
             'first_name' => 'required',
             'last_name' => 'required',
+            'profile_img' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
+
+        if ($request->hasFile('profile_img')) {
+            $validatedData['profile_img'] = file_get_contents($request->file('profile_img')->getRealPath());
+        }
 
         $validatedData['password'] = bcrypt($validatedData['password']);
 
         $user = User::create($validatedData);
+
+        if ($user->profile_img) {
+            $user->profile_img = base64_encode($user->profile_img);
+        }
 
         return response()->json($user, 201);
     }
@@ -56,13 +73,22 @@ class UserController extends Controller
             'password' => 'sometimes|required|min:6',
             'first_name' => 'sometimes|required',
             'last_name' => 'sometimes|required',
+            'profile_img' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
+
+        if ($request->hasFile('profile_img')) {
+            $validatedData['profile_img'] = file_get_contents($request->file('profile_img')->getRealPath());
+        }
 
         if (isset($validatedData['password'])) {
             $validatedData['password'] = bcrypt($validatedData['password']);
         }
 
         $user->update($validatedData);
+
+        if ($user->profile_img) {
+            $user->profile_img = base64_encode($user->profile_img);
+        }
 
         return response()->json($user);
     }
