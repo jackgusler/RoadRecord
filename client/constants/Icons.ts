@@ -1,0 +1,1 @@
+import arrowLeft from '../assets/icons/arrow-fat-left-duotone.png';
