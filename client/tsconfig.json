@@ -13,5 +13,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "constants/Icons.js"  ]
+, "constants/Icons.js", "app/(tabs)/_layout.jsx", "app/index.jsx", "app/_layout.jsx"  ]
 }
