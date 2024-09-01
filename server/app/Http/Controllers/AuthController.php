@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Auth;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class AuthController extends Controller
 {
@@ -44,13 +46,25 @@ class AuthController extends Controller
             'profile_img' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        // Handle profile image upload if present
         if ($request->hasFile('profile_img')) {
             $userData['profile_img'] = file_get_contents($request->file('profile_img')->getRealPath());
         } else {
-            // Assign default profile image if not provided
+            // Create new manager instance with desired driver
+            $manager = ImageManager::gd();
+
+            // Load the default profile image
             $imagePath = public_path('images/user-circle-duotone.png');
-            $userData['profile_img'] = file_get_contents($imagePath);
+            $image = $manager->read($imagePath);
+
+            // Generate a random color for tint
+            $red = rand(0, 255);
+            $green = rand(0, 255);
+            $blue = rand(0, 255);
+
+            $image->colorize($red, $green, $blue);
+
+            // Convert the image to a blob
+            $userData['profile_img'] = (string) $image->toPng();
         }
 
         $userData['password'] = bcrypt($userData['password']);
