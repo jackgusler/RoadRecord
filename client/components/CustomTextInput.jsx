@@ -1,19 +1,26 @@
 import {
-    View,
-    Text,
-    TextInput,
-    TouchableWithoutFeedback,
-    Keyboard,
-  } from "react-native";
-  import React from "react";
-  
-  const CustomTextInput = ({
-    label,
-    placeholder,
-    handleChangeText,
-    value,
-    secureTextEntry,
-  }) => {
+  View,
+  Text,
+  TextInput,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from "react-native";
+import React, { forwardRef } from "react";
+
+const CustomTextInput = forwardRef(
+  (
+    {
+      label,
+      placeholder,
+      handleChangeText,
+      value,
+      secureTextEntry,
+      returnKeyType,
+      onSubmitEditing,
+      blurOnSubmit,
+    },
+    ref
+  ) => {
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View className="mb-4 w-full">
@@ -25,11 +32,15 @@ import {
             onChangeText={handleChangeText}
             value={value}
             secureTextEntry={secureTextEntry}
+            returnKeyType={returnKeyType}
+            onSubmitEditing={onSubmitEditing}
+            blurOnSubmit={blurOnSubmit}
+            ref={ref}
           />
         </View>
       </TouchableWithoutFeedback>
     );
-  };
-  
-  export default CustomTextInput;
-  
+  }
+);
+
+export default CustomTextInput;

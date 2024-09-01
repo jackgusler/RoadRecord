@@ -10,7 +10,7 @@ export const getUsers = async () => {
       "Error fetching users:",
       error.response ? error.response.data : error.message
     );
-    throw error; // Rethrow the error if you need to handle it further up the chain
+    throw error;
   }
 };
 
@@ -23,7 +23,7 @@ export const getUser = async (id) => {
       `Error fetching user with id ${id}:`,
       error.response ? error.response.data : error.message
     );
-    throw error; // Rethrow the error if you need to handle it further up the chain
+    throw error;
   }
 };
 
@@ -36,7 +36,7 @@ export const createUser = async (userData) => {
       "Error creating user:",
       error.response ? error.response.data : error.message
     );
-    throw error; // Rethrow the error if you need to handle it further up the chain
+    throw error;
   }
 };
 
@@ -49,7 +49,7 @@ export const updateUser = async (id, userData) => {
       `Error updating user with id ${id}:`,
       error.response ? error.response.data : error.message
     );
-    throw error; // Rethrow the error if you need to handle it further up the chain
+    throw error;
   }
 };
 
@@ -61,6 +61,6 @@ export const deleteUser = async (id) => {
       `Error deleting user with id ${id}:`,
       error.response ? error.response.data : error.message
     );
-    throw error; // Rethrow the error if you need to handle it further up the chain
+    throw error;
   }
 };

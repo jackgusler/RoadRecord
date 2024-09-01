@@ -47,4 +47,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Accessor for the profile_img attribute.
+     *
+     * @return string|null
+     */
+    public function getProfileImgAttribute($value)
+    {
+        return $value ? base64_encode($value) : null;
+    }
 }

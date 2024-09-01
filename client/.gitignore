@@ -18,3 +18,6 @@ web-build/
 
 expo-env.d.ts
 # @end expo-cli
+
+# Ignore ngrok_url.txt
+client/ngrok_url.txt

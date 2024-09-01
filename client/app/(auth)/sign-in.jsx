@@ -1,27 +1,79 @@
-import { Text } from "react-native";
-import React from "react";
+// sign-in.jsx
+import { Alert, Text, View } from "react-native";
+import React, { useRef, useState } from "react";
 import Button from "../../components/Button";
 import CustomTextInput from "../../components/CustomTextInput";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { router } from "expo-router";
+import { signIn } from "../../services/authService";
+import { useAuth } from "../../context/AuthContext";
 
 const SignIn = () => {
+  const { setIsLoggedIn } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const emailRef = useRef();
+  const passwordRef = useRef();
+
+  const handleSignIn = async () => {
+    try {
+      const credentials = { email, password };
+      const response = await signIn(credentials);
+
+      if (response.success) {
+        // Check if the response indicates success
+        setIsLoggedIn(true);
+        router.replace("/home");
+      } else {
+        Alert.alert(
+          "Error",
+          response.message || "Sign-in failed. Please try again."
+        );
+      }
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+  };
+
   return (
-    <SafeAreaView className="flex-1 justify-center items-center bg-accent p-4">
-      <Text className="text-4xl font-abold text-primary mb-8">Sign in</Text>
-      <CustomTextInput
-        label="Username or Email"
-        placeholder="Username"
-        handleChangeText={() => {}}
-        value=""
-      />
-      <CustomTextInput
-        label="Password"
-        placeholder="Password"
-        handleChangeText={() => {}}
-        value=""
-        secureTextEntry={true}
-      />
-      <Button title="Sign in" handlePress={() => {}} color="primary" />
+    <SafeAreaView className="flex-1 bg-accent">
+      <View className="flex-1 justify-between">
+        <View className="items-center">
+          <Text className="text-4xl font-abold text-primary my-8">Sign in</Text>
+        </View>
+        <KeyboardAwareScrollView
+          className="flex-1 px-4"
+          contentContainerStyle={{ paddingBottom: 20 }}
+          extraScrollHeight={20}
+          enableOnAndroid={true}
+        >
+          <CustomTextInput
+            label="Email"
+            placeholder="Email"
+            handleChangeText={setEmail}
+            value={email}
+            returnKeyType="next"
+            onSubmitEditing={() => passwordRef.current.focus()}
+            blurOnSubmit={false}
+            ref={emailRef}
+          />
+          <CustomTextInput
+            label="Password"
+            placeholder="Password"
+            handleChangeText={setPassword}
+            value={password}
+            secureTextEntry={true}
+            returnKeyType="done"
+            blurOnSubmit={true}
+            ref={passwordRef}
+          />
+        </KeyboardAwareScrollView>
+        <View className="px-4 mb-4">
+          <Button title="Sign in" handlePress={handleSignIn} color="primary" />
+        </View>
+      </View>
     </SafeAreaView>
   );
 };
