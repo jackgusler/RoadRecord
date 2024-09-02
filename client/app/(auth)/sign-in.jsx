@@ -23,7 +23,6 @@ const SignIn = () => {
       const response = await signIn(credentials);
 
       if (response.success) {
-        // Check if the response indicates success
         setIsLoggedIn(true);
         router.replace("/home");
       } else {

@@ -17,17 +17,12 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::prefix('api')
             ->middleware('api')
-            ->group(function () {
-                Route::prefix('auth')->middleware('web')->group(base_path('routes/auth.php')); // Apply 'web' middleware to auth routes
-                Route::prefix('users')->group(base_path('routes/users.php'));
-            });
+            ->group(base_path('routes/api.php')); // Reference the new api.php file
     }
 
     protected function mapWebRoutes()
     {
         Route::middleware('web')
-            ->group(function () {
-                Route::group([], base_path('routes/web.php'));
-            });
+            ->group(base_path('routes/web.php'));
     }
 }

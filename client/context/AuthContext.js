@@ -1,7 +1,6 @@
 // AuthContext.js
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { checkAuthStatus } from "../services/authService";
-import { fetchCsrfToken } from "@/services/api";
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
@@ -13,7 +12,6 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        await fetchCsrfToken();
         const status = await checkAuthStatus();
         setIsLoggedIn(status);
       } catch (error) {

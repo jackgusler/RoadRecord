@@ -1,84 +1,61 @@
 // services/authService.js
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import api, { fetchCsrfToken } from "./api";
+import api from "./api";
 
-export const handleRequest = async (requestFunction) => {
+export const signIn = async (credentials) => {
   try {
-    const response = await requestFunction();
-    console.log("Request succeeded:", response);
-    return response; // Ensure the response is returned
+    const response = await api.post("/auth/sign-in", credentials);
+    const { token } = response.data;
+    await AsyncStorage.setItem("jwt_token", token);
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    return { success: true, token };
   } catch (error) {
-    console.error("Request failed:", error);
-    if (error.response && error.response.status === 419) {
-      await fetchCsrfToken();
-      return await requestFunction();
-    } else {
-      console.error(
-        "Request failed:",
-        error.response ? error.response.data : error.message
-      );
-      throw error;
-    }
+    console.error("Sign in failed:", error);
+    return { success: false, message: error.response?.data?.message || error.message };
   }
 };
 
-export const signIn = async (credentials) => {
-  await fetchCsrfToken();
-  return await handleRequest(async () => {
-    const csrfToken = await AsyncStorage.getItem("csrf_token");
-    const response = await api.post("/auth/sign-in", credentials, {
-      headers: {
-        "X-CSRF-TOKEN": csrfToken,
-      },
-    });
-    return {
-      success: response.status === 200,
-      ...response.data,
-    };
-  });
-};
-
 export const signUp = async (userData) => {
-  return await handleRequest(async () => {
-    const csrfToken = await AsyncStorage.getItem("csrf_token");
-    const response = await api.post("/auth/sign-up", userData, {
-      headers: {
-        "X-CSRF-TOKEN": csrfToken,
-      },
-    });
-    return response;
-  });
+  try {
+    const response = await api.post("/auth/sign-up", userData);
+    const { token } = response.data;
+    await AsyncStorage.setItem("jwt_token", token);
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    return { success: true, token };
+  } catch (error) {
+    console.error("Sign up failed:", error);
+    return { success: false, message: error.response?.data?.message || error.message };
+  }
 };
 
 export const signOut = async () => {
-  await fetchCsrfToken(); // Ensure CSRF token is fetched before sign-out
-  return await handleRequest(async () => {
-    const csrfToken = await AsyncStorage.getItem("csrf_token");
-    const response = await api.post(
-      "/auth/sign-out",
-      {},
-      {
-        headers: {
-          "X-CSRF-TOKEN": csrfToken,
-        },
-      }
-    );
-  });
+  try {
+    const token = await AsyncStorage.getItem("jwt_token");
+    if (token) {
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      const response = await api.post("/auth/sign-out");
+      await AsyncStorage.removeItem("jwt_token");
+      delete api.defaults.headers.common["Authorization"];
+      return { success: true };
+    } else {
+      console.error("Sign out failed: No token found");
+      throw new Error("No token found");
+    }
+  } catch (error) {
+    console.error("Sign out failed:", error);
+    return { success: false, message: error.response?.data?.message || error.message };
+  }
 };
 
 export const checkAuthStatus = async () => {
   try {
-    const csrfToken = await AsyncStorage.getItem("csrf_token");
-    const response = await api.post(
-      "/auth/status",
-      {},
-      {
-        headers: {
-          "X-CSRF-TOKEN": csrfToken,
-        },
-      }
-    );
-    return response.data.authenticated;
+    const token = await AsyncStorage.getItem("jwt_token");
+    if (token) {
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      const response = await api.post("/auth/status");
+      return response.data.authenticated;
+    }
+    return false;
   } catch (error) {
     console.error(
       "Error checking auth status:",

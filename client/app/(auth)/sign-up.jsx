@@ -5,8 +5,7 @@ import CustomTextInput from "../../components/CustomTextInput";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { signUp, signIn, handleRequest } from "../../services/authService";
-import { fetchCsrfToken } from "../../services/api";
+import { signUp, signIn } from "../../services/authService";
 
 const SignUp = () => {
   const [username, setUsername] = useState("");
@@ -35,43 +34,39 @@ const SignUp = () => {
     }
 
     try {
-      await fetchCsrfToken();
       const userData = { username, email, password, first_name, last_name };
       const response = await signUp(userData);
 
-      if (response.status === 201) {
+      if (response.success) {
         const credentials = { email, password };
         await handleSignIn(credentials); // Sign in after successful sign up
       } else {
-        const errorMessage =
-          response.data?.message || "Sign-up failed. Please try again.";
-        Alert.alert("Error", errorMessage);
+        Alert.alert(
+          "Error",
+          response.message || "Sign-up failed. Please try again."
+        );
       }
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Sign-up failed. Please try again.";
-      Alert.alert("Error", errorMessage);
+      Alert.alert(
+        "Error",
+        error.message || "Sign-up failed. Please try again."
+      );
     }
   };
 
   const handleSignIn = async (credentials) => {
     try {
-      const response = await handleRequest(() => signIn(credentials));
+      const response = await signIn(credentials);
 
-      if (response.success === true) {
-        // Sign-in successful
+      if (response.success) {
         router.replace("/home");
       } else {
-        // Handle non-200 status codes
         Alert.alert(
           "Error",
           response.message || "Sign-in failed. Please try again."
         );
       }
     } catch (error) {
-      // Handle network or other unexpected errors
       Alert.alert(
         "Error",
         error.message || "Sign-in failed. Please try again."
