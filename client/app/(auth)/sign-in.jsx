@@ -65,7 +65,8 @@ const SignIn = () => {
             value={password}
             secureTextEntry={true}
             returnKeyType="done"
-            blurOnSubmit={true}
+            onSubmitEditing={handleSignIn}
+            blurOnSubmit={false}
             ref={passwordRef}
           />
         </KeyboardAwareScrollView>

@@ -13,6 +13,9 @@ class LicensePlateCSVSeeder extends Seeder
      */
     public function run(): void
     {
+        // Truncate the table
+        DB::table('license_plate')->truncate();
+
         // Path to the CSV file
         $csvFilePath = public_path('csv/us-license-plates-updated.csv');
 
@@ -57,7 +60,6 @@ class LicensePlateCSVSeeder extends Seeder
                 'plate_title' => $rowData['plate_title'],
                 'plate_name' => $rowData['plate_img'],
                 'plate_img' => $imageContent,
-                'seen' => false, // Default value for seen
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
