@@ -3,10 +3,12 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\LicensePlateController;
 
 // Public routes
 Route::post('/auth/sign-in', [AuthController::class, 'signIn']);
 Route::post('/auth/sign-up', [AuthController::class, 'signUp']);
+Route::get('/license-plates/{state}', [LicensePlateController::class, 'getByState']);
 
 // Protected routes
 Route::group(['middleware' => ['jwt.auth']], function () {
