@@ -7,7 +7,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Intervention\Image\ImageManager;
 
-class DatabaseSeeder extends Seeder
+class UserSeeder extends Seeder
 {
     /**
      * Seed the application's database.
@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
         $manager = ImageManager::gd();
 
         // Load the default profile image
-        $imagePath = public_path('images/user-circle-duotone.png');
+        $imagePath = public_path('images/profile/user-circle-duotone.png');
 
         // Define a set of nature-inspired colors
         $natureColors = [

@@ -41,7 +41,7 @@ class AuthController extends Controller
             $manager = ImageManager::gd();
 
             // Load the default profile image
-            $imagePath = public_path('images/user-circle-duotone.png');
+            $imagePath = public_path('images/profile/user-circle-duotone.png');
             $image = $manager->read($imagePath);
 
             // Define a set of nature-inspired colors
