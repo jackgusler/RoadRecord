@@ -6,8 +6,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { signUp, signIn } from "../../services/authService";
+import { useGlobalContext } from "../../context/AuthContext";
+import { getCurrentUser } from "../../services/userService";
 
 const SignUp = () => {
+  const { setUser, setIsLoggedIn } = useGlobalContext();
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -59,6 +63,9 @@ const SignUp = () => {
       const response = await signIn(credentials);
 
       if (response.success) {
+        const res = await getCurrentUser();
+        setUser(res.user);
+        setIsLoggedIn(true);
         router.replace("/home");
       } else {
         Alert.alert(

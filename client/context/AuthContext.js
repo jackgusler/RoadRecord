@@ -1,34 +1,39 @@
 // AuthContext.js
 import React, { createContext, useState, useEffect, useContext } from "react";
-import { checkAuthStatus } from "../services/authService";
+import { getCurrentUser } from "../services/userService";
 
 const AuthContext = createContext();
-export const useAuth = () => useContext(AuthContext);
+export const useGlobalContext = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        const status = await checkAuthStatus();
-        setIsLoggedIn(status);
-      } catch (error) {
-        console.error("Error initializing auth:", error);
-      } finally {
+    getCurrentUser()
+      .then((res) => {
+        if (res) {
+          setIsLoggedIn(true);
+          setUser(res.user);
+        } else {
+          setIsLoggedIn(false);
+          setUser(null);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
         setIsLoading(false);
-      }
-    };
-
-    initializeAuth();
+      });
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, isLoading }}>
+    <AuthContext.Provider
+      value={{ isLoggedIn, setIsLoggedIn, user, setUser, isLoading }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
-
-export default AuthContext;

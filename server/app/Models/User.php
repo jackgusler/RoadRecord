@@ -41,13 +41,10 @@ class User extends Authenticatable implements JWTSubject
      *
      * @return array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
 
     /**
      * Accessor for the profile_img attribute.
@@ -56,7 +53,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function getProfileImgAttribute($value)
     {
-        return $value ? base64_encode($value) : null;
+        return $value ? 'data:image/jpeg;base64,' . base64_encode($value) : null;
     }
 
     /**

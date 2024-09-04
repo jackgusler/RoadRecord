@@ -2,10 +2,10 @@ import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Redirect, router } from "expo-router";
 import Button from "../components/Button";
-import { useAuth } from "../context/AuthContext";
+import { useGlobalContext } from "../context/AuthContext";
 
 export default function App() {
-  const { isLoading, isLoggedIn } = useAuth();
+  const { isLoading, isLoggedIn } = useGlobalContext();
 
   if (!isLoading && isLoggedIn) {
     return <Redirect href="/home" />;

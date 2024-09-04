@@ -14,7 +14,7 @@ export const getLicensePlate = async (page = 1, perPage = 10) => {
 
 export const getLicensePlatesById = async (id, page = 1, perPage = 10) => {
   try {
-    const response = await api.get(`/license-plates/${id}`, {
+    const response = await api.get(`/license-plates/id/${id}`, {
       params: { page, per_page: perPage },
     });
     return response.data;
@@ -30,7 +30,7 @@ export const getLicensePlatesByState = async (
   perPage = 10
 ) => {
   try {
-    const response = await api.get(`/license-plates/${state}`, {
+    const response = await api.get(`/license-plates/state/${state}`, {
       params: { page, per_page: perPage },
     });
     return response.data;
