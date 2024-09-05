@@ -29,15 +29,6 @@ class LicensePlate extends Model
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'id',
-    ];
-
-    /**
      * Accessor for the plate_img attribute.
      *
      * @return string|null

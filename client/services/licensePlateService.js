@@ -12,11 +12,9 @@ export const getLicensePlate = async (page = 1, perPage = 10) => {
   }
 };
 
-export const getLicensePlatesById = async (id, page = 1, perPage = 10) => {
+export const getLicensePlatesById = async (id) => {
   try {
-    const response = await api.get(`/license-plates/id/${id}`, {
-      params: { page, per_page: perPage },
-    });
+    const response = await api.get(`/license-plates/id/${id}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching license plates:", error);

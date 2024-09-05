@@ -42,7 +42,7 @@ const Search = () => {
         <FlatList
           data={results}
           keyExtractor={(item) =>
-            item.id ? item.id.toString() : Math.random().toString()
+            item.id
           }
           renderItem={({ item }) => <LicensePlateCard plate={item} />}
         />

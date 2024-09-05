@@ -10,9 +10,34 @@ import IconButton from "../../components/IconButton";
 import { icons } from "../../constants";
 import { signOut } from "../../services/authService";
 import { updateUser } from "../../services/userService";
+import { getLicensePlatesByUser } from "../../services/userLicensePlateService";
+import { getLicensePlatesById } from "../../services/licensePlateService";
+import LicensePlateCard from "../../components/LicensePlateCard";
 
 const Profile = () => {
   const { user, setUser, setIsLoggedIn } = useGlobalContext();
+  const [licensePlates, setLicensePlates] = useState([]);
+
+  useEffect(() => {
+    const fetchLicensePlates = async () => {
+      try {
+        const userPlates = await getLicensePlatesByUser(user.id);
+        const plates = await Promise.all(
+          userPlates.map(async (plate) => {
+            const plateDetails = await getLicensePlatesById(
+              plate.license_plate_id
+            );
+            return plateDetails;
+          })
+        );
+        setLicensePlates(plates);
+      } catch (error) {
+        console.error("Error fetching license plates:", error);
+      }
+    };
+
+    fetchLicensePlates();
+  }, [user.id]);
 
   const handleEditProfileImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -74,44 +99,51 @@ const Profile = () => {
   };
 
   return (
-    <>
-      <View className="bg-primary flex-1 p-4">
-        <View className="flex items-center mt-12">
+    <SafeAreaView className="bg-primary h-full">
+      <View className="bg-primary flex-1 px-4">
+        <View className="flex items-center">
           <Text className="font-abold text-4xl text-accent">
             {user.first_name} {user.last_name}
           </Text>
           <View className="relative">
-            {/* <Image
-              source={{ uri: `data:image/png;base64,${user.profile_img}` }}
-              className="w-32 h-32 rounded-full border-4 border-accent"
-            /> */}
             <View className="rounded-full border-4 border-accent">
-            <Image
-              source={{ uri: user.profile_img }}
-              className="w-32 h-32 rounded-full"
-            />
+              <Image
+                source={{ uri: user.profile_img }}
+                className="w-32 h-32 rounded-full"
+              />
             </View>
             <IconButton
               icon={icons.pencil}
               iconFilled={icons.pencilFill}
               handlePress={handleEditProfileImage}
-              positionStyles="absolute bottom-0 right-0"
+              positionStyles="absolute bottom-0 right-0 rounded-full border-4 border-accent "
             />
           </View>
           <Text className="font-abold text-2xl text-accent">
             @{user.username}
           </Text>
         </View>
-      </View>
 
-      <View className="bg-primary p-4">
-        <Button
-          title="Sign out"
-          handlePress={handleSignOut}
-          color="secondary"
-        />
+        {/* <View className="bg-primary px-2">
+          <Button
+            title="Sign out"
+            handlePress={handleSignOut}
+            color="secondary"
+          />
+        </View> */}
+
+        <View className="" style={{ flex: 1, marginBottom: -33 }}>
+          <Text className="my-4 font-abold text-2xl text-accent">
+            My License Plates
+          </Text>
+          <FlatList
+            data={licensePlates}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => <LicensePlateCard plate={item} />}
+          />
+        </View>
       </View>
-    </>
+    </SafeAreaView>
   );
 };
 

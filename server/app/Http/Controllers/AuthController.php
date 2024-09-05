@@ -41,8 +41,7 @@ class AuthController extends Controller
             $manager = ImageManager::gd();
 
             // Load the default profile image
-            $imagePath = public_path('images/profile/user-circle-duotone.png');
-            $image = $manager->read($imagePath);
+            $imagePath = public_path('images/profile/user-circle-duotone-2.png');
 
             // Define a set of nature-inspired colors
             $natureColors = [
@@ -81,17 +80,22 @@ class AuthController extends Controller
             // Randomly select a color from the set
             $selectedColor = $natureColors[array_rand($natureColors)];
 
-            $centerX = 256;
-            $centerY = 256;
-            $radius = 208;
-
-            $image->drawCircle($centerX, $centerY, function ($circle) use ($selectedColor, $radius) {
-                $circle->radius($radius); // radius of circle in pixels
-                $circle->background($selectedColor, 50); // background color
+            $background = $manager->create(512, 512)->drawCircle(256, 256, function ($circle) use ($selectedColor) {
+                $circle->radius(257);
+                $circle->background($selectedColor);
             });
 
+            // Load the profile image
+            $profileImage = $manager->read($imagePath)->resize(512, 512);
+
+            // Overlay the profile image on top of the background
+            $background->place($profileImage, 'center', 0, 0, 50);
+
             // Convert the image to a blob
-            $userData['profile_img'] = (string) $image->toPng();
+            $image = $background->toPng();
+
+            // Convert the image to a blob
+            $userData['profile_img'] = (string) $image;
         }
 
         $userData['password'] = bcrypt($userData['password']);
