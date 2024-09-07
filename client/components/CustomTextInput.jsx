@@ -14,6 +14,9 @@ const CustomTextInput = forwardRef(
       placeholder,
       handleChangeText,
       value,
+      containerStyles,
+      inputStyles,
+      textColor,
       secureTextEntry,
       returnKeyType,
       onSubmitEditing,
@@ -23,12 +26,12 @@ const CustomTextInput = forwardRef(
   ) => {
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View className="mb-4 w-full">
+        <View className={containerStyles}>
           {label && <Text className="text-lg font-semibold mb-2">{label}</Text>}
           <TextInput
-            className="border-2 border-muted h-16 px-4 bg-black-100 rounded-2xl focus:border-secondary"
+            className={`px-4 rounded-2xl border-2 border-muted focus:border-secondary font-amedium ${inputStyles}`}
             placeholder={placeholder}
-            placeholderTextColor={"#748B75"}
+            placeholderTextColor={textColor}
             onChangeText={handleChangeText}
             value={value}
             secureTextEntry={secureTextEntry}

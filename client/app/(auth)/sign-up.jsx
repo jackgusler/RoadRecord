@@ -100,6 +100,9 @@ const SignUp = () => {
                 placeholder="First name"
                 handleChangeText={setFirstName}
                 value={first_name}
+                containerStyles="mb-4 w-full"
+            inputStyles="h-16"
+            textColor="#748B75"
                 returnKeyType="next"
                 onSubmitEditing={() => lastNameRef.current.focus()}
                 blurOnSubmit={false}
@@ -112,6 +115,9 @@ const SignUp = () => {
                 placeholder="Last name"
                 handleChangeText={setLastName}
                 value={last_name}
+                containerStyles="mb-4 w-full"
+            inputStyles="h-16"
+            textColor="#748B75"
                 returnKeyType="next"
                 onSubmitEditing={() => usernameRef.current.focus()}
                 blurOnSubmit={false}
@@ -124,6 +130,9 @@ const SignUp = () => {
             placeholder="Username"
             handleChangeText={setUsername}
             value={username}
+            containerStyles="mb-4 w-full"
+            inputStyles="h-16"
+            textColor="#748B75"
             returnKeyType="next"
             onSubmitEditing={() => emailRef.current.focus()}
             blurOnSubmit={false}
@@ -134,6 +143,9 @@ const SignUp = () => {
             placeholder="Email"
             handleChangeText={setEmail}
             value={email}
+            containerStyles="mb-4 w-full"
+            inputStyles="h-16"
+            textColor="#748B75"
             returnKeyType="next"
             onSubmitEditing={() => passwordRef.current.focus()}
             blurOnSubmit={false}
@@ -144,6 +156,9 @@ const SignUp = () => {
             placeholder="Password"
             handleChangeText={setPassword}
             value={password}
+            containerStyles="mb-4 w-full"
+            inputStyles="h-16"
+            textColor="#748B75"
             secureTextEntry={true}
             returnKeyType="next"
             onSubmitEditing={() => confirmPasswordRef.current.focus()}
@@ -155,6 +170,9 @@ const SignUp = () => {
             placeholder="Confirm Password"
             handleChangeText={setConfirmPassword}
             value={confirmPassword}
+            containerStyles="mb-4 w-full"
+            inputStyles="h-16"
+            textColor="#748B75"
             secureTextEntry={true}
             returnKeyType="done"
             onSubmitEditing={handleSignUp}

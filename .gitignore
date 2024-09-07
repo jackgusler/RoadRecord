@@ -130,4 +130,4 @@ dist
 .pnp.*
 
 /server/public/images/plates
-/client/ngrok_url.txt
+/client/localtunnel_url.txt

@@ -56,6 +56,9 @@ const SignIn = () => {
             placeholder="Email"
             handleChangeText={setEmail}
             value={email}
+            containerStyles="mb-4 w-full"
+            inputStyles="h-16"
+            textColor="#748B75"
             returnKeyType="next"
             onSubmitEditing={() => passwordRef.current.focus()}
             blurOnSubmit={false}
@@ -66,6 +69,9 @@ const SignIn = () => {
             placeholder="Password"
             handleChangeText={setPassword}
             value={password}
+            containerStyles="mb-4 w-full"
+            inputStyles="h-16"
+            textColor="#748B75"
             secureTextEntry={true}
             returnKeyType="done"
             onSubmitEditing={handleSignIn}
