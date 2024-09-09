@@ -9,7 +9,6 @@ import Button from "../../../../components/Button";
 import { Flow } from "react-native-animated-spinkit";
 import { useGlobalContext } from "../../../../context/AuthContext";
 import { getLicensePlatesByUser } from "../../../../services/userLicensePlateService";
-import { convertToGrayscale } from "../../../../services/imageService";
 
 const State = () => {
   const params = useLocalSearchParams();
@@ -65,8 +64,8 @@ const State = () => {
   };
 
   return (
-    <SafeAreaView className="bg-primary h-full flex items-start justify-start p-4">
-      <View className="w-[100%] mt-4">
+    <SafeAreaView className="bg-primary h-full flex items-start justify-start p-4 ">
+      <View className="w-[100%] mt-[-58]">
         <StateFolder state={state} />
       </View>
       <View className="w-[100%] h-[100%] mt-4 flex-1 mb-[-50]">

@@ -26,7 +26,7 @@ const StateFolder = ({ state }) => {
             </Text>
           </ImageBackground>
         </View> */}
-        <View className="w-100 bg-secondary rounded-md border-2 border-muted items-center">
+        <View className="w-100 bg-muted rounded-md border-2 border-secondary items-center">
           {/* <Text className="font-abold text-3xl text-primary px-1 pt-1">
             {state.abbreviation}
           </Text> */}

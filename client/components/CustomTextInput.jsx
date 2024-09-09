@@ -5,7 +5,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import React, { forwardRef } from "react";
+import React, { forwardRef, useState } from "react";
 
 const CustomTextInput = forwardRef(
   (
@@ -21,25 +21,42 @@ const CustomTextInput = forwardRef(
       returnKeyType,
       onSubmitEditing,
       blurOnSubmit,
+      search,
+      children,
     },
     ref
   ) => {
+    const [isFocused, setIsFocused] = useState(false);
+
+    const handleFocus = () => setIsFocused(true);
+    const handleBlur = () => setIsFocused(false);
+
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View className={containerStyles}>
           {label && <Text className="text-lg font-semibold mb-2">{label}</Text>}
-          <TextInput
-            className={`px-4 rounded-2xl border-2 border-muted focus:border-secondary font-amedium ${inputStyles}`}
-            placeholder={placeholder}
-            placeholderTextColor={textColor}
-            onChangeText={handleChangeText}
-            value={value}
-            secureTextEntry={secureTextEntry}
-            returnKeyType={returnKeyType}
-            onSubmitEditing={onSubmitEditing}
-            blurOnSubmit={blurOnSubmit}
-            ref={ref}
-          />
+          <View
+            className={`flex-row items-center border-2 rounded-2xl overflow-hidden ${
+              isFocused ? "border-secondary" : "border-muted"
+            } ${search ? "bg-primary" : ""}`}
+          >
+            <TextInput
+              className={`flex-1 px-4 font-amedium ${inputStyles}`}
+              placeholder={placeholder}
+              placeholderTextColor={textColor}
+              onChangeText={handleChangeText}
+              value={value}
+              secureTextEntry={secureTextEntry}
+              returnKeyType={returnKeyType}
+              onSubmitEditing={onSubmitEditing}
+              blurOnSubmit={blurOnSubmit}
+              ref={ref}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+            />
+
+            {search && children({ isFocused })}
+          </View>
         </View>
       </TouchableWithoutFeedback>
     );
