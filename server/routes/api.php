@@ -11,7 +11,7 @@ Route::post('/auth/sign-in', [AuthController::class, 'signIn']);
 Route::post('/auth/sign-up', [AuthController::class, 'signUp']);
 
 // Protected routes
-Route::group(['middleware' => ['jwt.auth']], function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/auth/sign-out', [AuthController::class, 'signOut']);
     Route::post('/auth/status', [AuthController::class, 'status']);
 

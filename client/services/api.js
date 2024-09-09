@@ -7,12 +7,12 @@ const api = axios.create({
   baseURL: `${Constants.expoConfig.extra.apiUrl}/api`,
 });
 
-// Interceptor to add JWT token to headers
+// Interceptor to add Sanctum token to headers
 api.interceptors.request.use(
   async (config) => {
-    const token = await AsyncStorage.getItem("jwt_token");
+    const token = await AsyncStorage.getItem("sanctum_token");
     if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
+      config.headers["Authorization"] = token;
     }
     return config;
   },

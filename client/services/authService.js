@@ -5,36 +5,48 @@ import api from "./api";
 export const signIn = async (credentials) => {
   try {
     const response = await api.post("/auth/sign-in", credentials);
-    const { token } = response.data;
-    await AsyncStorage.setItem("jwt_token", token);
-    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    return { success: true, token };
+    const { access_token, token_type } = response.data;
+    const fullToken = `${token_type} ${access_token}`;
+
+    await AsyncStorage.setItem("sanctum_token", fullToken);
+    api.defaults.headers.common["Authorization"] = fullToken;
+
+    return { success: true, token: fullToken };
   } catch (error) {
     console.error("Sign in failed:", error);
-    return { success: false, message: error.response?.data?.message || error.message };
+    return {
+      success: false,
+      message: error.response?.data?.message || error.message,
+    };
   }
 };
 
 export const signUp = async (userData) => {
   try {
     const response = await api.post("/auth/sign-up", userData);
-    const { token } = response.data;
-    await AsyncStorage.setItem("jwt_token", token);
-    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    return { success: true, token };
+    const { access_token, token_type } = response.data;
+    const fullToken = `${token_type} ${access_token}`;
+
+    await AsyncStorage.setItem("sanctum_token", fullToken);
+    api.defaults.headers.common["Authorization"] = fullToken;
+
+    return { success: true, token: fullToken };
   } catch (error) {
     console.error("Sign up failed:", error);
-    return { success: false, message: error.response?.data?.message || error.message };
+    return {
+      success: false,
+      message: error.response?.data?.message || error.message,
+    };
   }
 };
 
 export const signOut = async () => {
   try {
-    const token = await AsyncStorage.getItem("jwt_token");
+    const token = await AsyncStorage.getItem("sanctum_token");
     if (token) {
-      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      const response = await api.post("/auth/sign-out");
-      await AsyncStorage.removeItem("jwt_token");
+      api.defaults.headers.common["Authorization"] = token;
+      await api.post("/auth/sign-out");
+      await AsyncStorage.removeItem("sanctum_token");
       delete api.defaults.headers.common["Authorization"];
       return { success: true };
     } else {
@@ -43,15 +55,18 @@ export const signOut = async () => {
     }
   } catch (error) {
     console.error("Sign out failed:", error);
-    return { success: false, message: error.response?.data?.message || error.message };
+    return {
+      success: false,
+      message: error.response?.data?.message || error.message,
+    };
   }
 };
 
 export const checkAuthStatus = async () => {
   try {
-    const token = await AsyncStorage.getItem("jwt_token");
+    const token = await AsyncStorage.getItem("sanctum_token");
     if (token) {
-      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      api.defaults.headers.common["Authorization"] = token;
       const response = await api.post("/auth/status");
       return response.data.authenticated;
     }

@@ -5,22 +5,33 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Hash;
 use Intervention\Image\ImageManager;
 
 class AuthController extends Controller
 {
     // User sign in
+    // User sign in
     public function signIn(Request $request)
     {
         $credentials = $request->only('email', 'password');
-        if (!$token = JWTAuth::attempt($credentials)) {
-            $user = User::where('email', $credentials['email'])->first();
-            $error = $user ? 'Incorrect password' : 'User not found';
+
+        if (!Auth::attempt($credentials)) {
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
-        return response()->json(['token' => $token]);
+
+        // Fetch the user using the credentials
+        $user = User::where('email', $request->email)->first();
+
+        // Now create the token for this user
+        $token = $user->createToken('Personal Access Token')->plainTextToken;
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ]);
     }
+
 
     // User sign up
     public function signUp(Request $request)
@@ -98,19 +109,23 @@ class AuthController extends Controller
             $userData['profile_img'] = (string) $image;
         }
 
-        $userData['password'] = bcrypt($userData['password']);
+        $userData['password'] = Hash::make($userData['password']);
 
         $user = User::create($userData);
 
-        $token = JWTAuth::fromUser($user);
+        $token = $user->createToken('Personal Access Token')->plainTextToken;
 
-        return response()->json(['user' => $user, 'token' => $token], 201);
+        return response()->json([
+            'user' => $user,
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ], 201);
     }
 
     // User sign out
     public function signOut(Request $request)
     {
-        JWTAuth::invalidate(JWTAuth::getToken());
+        $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Sign out successful']);
     }
