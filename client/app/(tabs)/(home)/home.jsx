@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, FlatList } from "react-native";
 import React from "react";
-import StateFolder from "../../../components/StateFolder";
+import StateFolder from "../../../components/StateButton";
 import states from "../../../assets/data/states";
 
 const Home = () => {

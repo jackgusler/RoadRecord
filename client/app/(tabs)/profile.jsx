@@ -100,9 +100,9 @@ const Profile = () => {
 
   return (
     <SafeAreaView className="bg-primary h-full">
-      <View className="bg-primary flex-1 px-4">
+      <View className="bg-primary flex-1 px-4 mt-20">
         <View className="flex items-center">
-          <Text className="font-abold text-4xl text-accent">
+          <Text className="font-abold text-4xl text-accent mb-2">
             {user.first_name} {user.last_name}
           </Text>
           <View className="relative">
