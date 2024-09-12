@@ -23,25 +23,32 @@ const CustomTextInput = forwardRef(
       blurOnSubmit,
       search,
       children,
+      onFocus, // Add onFocus prop
+      onBlur,  // Add onBlur prop
     },
     ref
   ) => {
     const [isFocused, setIsFocused] = useState(false);
 
-    const handleFocus = () => setIsFocused(true);
-    const handleBlur = () => setIsFocused(false);
+    const handleFocus = () => {
+      setIsFocused(true);
+      if (onFocus) onFocus(); // Call the passed onFocus prop
+    };
+
+    const handleBlur = () => {
+      setIsFocused(false);
+      if (onBlur) onBlur(); // Call the passed onBlur prop
+    };
 
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View className={containerStyles}>
           {label && <Text className="text-lg font-semibold mb-2">{label}</Text>}
           <View
-            className={`flex-row items-center border-2 rounded-2xl overflow-hidden ${
-              isFocused ? "border-secondary" : "border-muted"
-            } ${search ? "bg-primary" : ""}`}
+            className={`flex-row items-center border-2 rounded-2xl overflow-hidden border-secondary ${search ? "bg-primary" : ""}`}
           >
             <TextInput
-              className={`flex-1 px-4 font-amedium ${inputStyles}`}
+              className={`flex-1 px-4 font-asemibold bg-primary ${inputStyles}`}
               placeholder={placeholder}
               placeholderTextColor={textColor}
               onChangeText={handleChangeText}
@@ -51,8 +58,8 @@ const CustomTextInput = forwardRef(
               onSubmitEditing={onSubmitEditing}
               blurOnSubmit={blurOnSubmit}
               ref={ref}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
+              onFocus={handleFocus} // Use handleFocus
+              onBlur={handleBlur}   // Use handleBlur
             />
 
             {search && children({ isFocused })}
