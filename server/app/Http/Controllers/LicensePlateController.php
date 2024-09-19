@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LicensePlate;
+use App\Models\UserLicensePlate;
 use Illuminate\Http\Request;
 
 class LicensePlateController extends Controller
@@ -26,6 +27,15 @@ class LicensePlateController extends Controller
         }
 
         return response()->json($licensePlate);
+    }
+
+    // Get license plate details by user id
+    public function getByUser($userId)
+    {
+        $licensePlatesIds = UserLicensePlate::where('user_id', $userId)->pluck('license_plate_id');
+        $licensePlates = LicensePlate::whereIn('id', $licensePlatesIds)->get();
+
+        return response()->json($licensePlates);
     }
 
     // Get license plates by state with pagination

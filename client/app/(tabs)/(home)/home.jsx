@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, FlatList } from "react-native";
 import React from "react";
-import StateFolder from "../../../components/StateButton";
+import StateButton from "../../../components/StateButton";
 import states from "../../../assets/data/states";
 
 const Home = () => {
@@ -8,7 +8,7 @@ const Home = () => {
     <View className="bg-primary flex-1 w-full h-full px-4">
       <FlatList
         data={states}
-        renderItem={({ item }) => <StateFolder state={item} />}
+        renderItem={({ item }) => <StateButton state={item} type={"home"} />}
         keyExtractor={(item) => item.abbreviation}
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
         ListHeaderComponent={() => <View style={{ paddingTop: 138 }} />}

@@ -9,6 +9,13 @@ module.exports = {
         accent: "#F5FBEF", // Light Beige
         muted: "#748B75", // Muted Olive
         dark: "#503D42", // Deep Brown
+
+        // primary: "#839788",
+        // secondary: "#eee0cb",
+        // accent: "#bfd7ea",
+        // muted: "#baa898",
+        // dark: "#000000",
+
       },
     },
     fontFamily: {

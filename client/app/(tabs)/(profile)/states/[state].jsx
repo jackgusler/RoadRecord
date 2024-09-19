@@ -1,44 +1,42 @@
 import { useLocalSearchParams } from "expo-router";
-import { View, Text, StyleSheet, FlatList, Image } from "react-native";
+import { View, Text, FlatList, Image } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import StateButton from "../../../../components/StateButton";
 import LicensePlateCard from "../../../../components/LicensePlateCard";
-import { getLicensePlatesByState } from "../../../../services/licensePlateService";
-import Button from "../../../../components/Button";
 import { Flow } from "react-native-animated-spinkit";
 import { useGlobalContext } from "../../../../context/AuthContext";
-import { getLicensePlatesByUser } from "../../../../services/userLicensePlateService";
 import { icons } from "../../../../constants";
 
 const State = () => {
   const params = useLocalSearchParams();
   let state = JSON.parse(decodeURIComponent(params.state));
 
-  const { user, userLicensePlates, removeLicensePlate } = useGlobalContext();
-  const [licensePlates, setLicensePlates] = useState([]);
+  const { userLicensePlatesDetails } = useGlobalContext();
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [plates, setPlates] = useState([]);
+
+  //   useEffect(() => {
+  //     fetchLicensePlates();
+  //   }, [page]);
 
   useEffect(() => {
-    fetchLicensePlates();
-  }, [page]);
-
-  const fetchLicensePlates = async () => {
-    setLoading(true);
-    try {
-      const data = await getLicensePlatesByState(state.abbreviation, page, 24);
-      setLicensePlates((prevPlates) => [...prevPlates, ...data.data]);
-      if (data.data.length < 24) {
-        setHasMore(false);
-      }
-    } catch (error) {
-      console.error("Error fetching license plates:", error);
-    } finally {
-      setLoading(false);
+    if (state.abbreviation === "ALL") {
+      setPlates(
+        [...userLicensePlatesDetails].sort((a, b) =>
+          a.plate_title.localeCompare(b.plate_title)
+        )
+      );
+    } else {
+      setPlates(
+        userLicensePlatesDetails.filter(
+          (plate) => plate.state === state.abbreviation
+        )
+      );
     }
-  };
+  }, [state.abbreviation, userLicensePlatesDetails]);
 
   const loadMore = () => {
     if (hasMore) {
@@ -47,20 +45,20 @@ const State = () => {
   };
 
   return (
-    <SafeAreaView className="bg-primary h-full flex items-start justify-start p-4 mt-24">
-      <View className="w-[100%] mt-[-32]">
+    <SafeAreaView className="bg-primary h-full flex items-start justify-start p-4">
+      <View className="w-[100%] mt-[-64]">
         <Image
           source={icons.arrowLeft}
           className="absolute top-4 left-4 z-10 w-8 h-8"
           tintColor="#0B3142"
           pointerEvents="none"
         />
-        <StateButton state={state} type={"home"} />
+        <StateButton state={state} type={"profile"} />
       </View>
-      <View className="w-[100%] h-[100%] flex-1 mb-32 ml-1">
-        {licensePlates.length > 0 ? (
+      <View className="w-[100%] h-[100%] flex-1 ml-1">
+        {plates.length > 0 ? (
           <FlatList
-            data={licensePlates}
+            data={plates}
             renderItem={({ item }) => {
               return <LicensePlateCard plate={item} />;
             }}
@@ -86,7 +84,7 @@ const State = () => {
                   <Flow className="m-4" size={48} color="#92AD94" />
                 </View>
               ) : (
-                <View className="mb-4" />
+                <View className="mb-11" />
               )
             }
             showsVerticalScrollIndicator={false}

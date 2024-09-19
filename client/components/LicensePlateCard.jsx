@@ -13,40 +13,52 @@ import { Image } from "expo-image";
 import Button from "./Button";
 import { icons } from "../constants";
 import * as userLP from "../services/userLicensePlateService";
+import { useGlobalContext } from "../context/AuthContext";
 
-const LicensePlateCard = ({ plate, seen, favorite }) => {
-  const [isFavorite, setIsFavorite] = useState(favorite);
-  const [isSeen, setIsSeen] = useState(seen);
+const LicensePlateCard = ({ plate }) => {
+  const { userLicensePlates, fetchLicensePlates, isLoading } =
+    useGlobalContext();
+
+  const [isFavorite, setIsFavorite] = useState();
+  const [isSeen, setIsSeen] = useState();
   const [modalVisible, setModalVisible] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const opacity = useRef(new Animated.Value(0)).current;
 
-  const handleFavoriteToggle = async () => {
-    try {
-      if (isFavorite) {
-        await userLP.unfavoriteLicensePlate(plate.id);
-        setIsFavorite(false);
-      } else {
-        await userLP.favoriteLicensePlate(plate.id);
-        setIsFavorite(true);
-      }
-    } catch (error) {
-      Alert.alert("Error", "Failed to toggle favorite status.");
-    }
-  };
+  useEffect(() => {
+    const favorite = userLicensePlates.find(
+      (lp) => lp.license_plate_id === plate.id && lp.favorite
+    );
+    setIsFavorite(favorite ? true : false);
+    const seen = userLicensePlates.find(
+      (lp) => lp.license_plate_id === plate.id && lp.seen
+    );
+    setIsSeen(seen ? true : false);
+  }, [userLicensePlates]);
 
-  const handleSeenToggle = async () => {
+  const handleToggle = async (isToggled, toggleType) => {
     try {
-      if (isSeen) {
-        await userLP.unseenLicensePlate(plate.id);
-        setIsSeen(false);
-      } else {
-        await userLP.seenLicensePlate(plate.id);
-        setIsSeen(true);
+      if (toggleType === "favorite") {
+        if (isToggled) {
+          await userLP.unfavoriteLicensePlate(plate.id);
+          setIsFavorite(false);
+        } else {
+          await userLP.favoriteLicensePlate(plate.id);
+          setIsFavorite(true);
+        }
+      } else if (toggleType === "seen") {
+        if (isToggled) {
+          await userLP.unseenLicensePlate(plate.id);
+          setIsSeen(false);
+        } else {
+          await userLP.seenLicensePlate(plate.id);
+          setIsSeen(true);
+        }
       }
     } catch (error) {
-      Alert.alert("Error", "Failed to toggle seen status.");
+      Alert.alert("Error", `Failed to toggle ${toggleType} status.`);
     }
+    fetchLicensePlates();
   };
 
   const toggleModal = () => {
@@ -128,17 +140,18 @@ const LicensePlateCard = ({ plate, seen, favorite }) => {
                 </View>
                 <View className="flex-row justify-between w-100">
                   <Button
-                    title={isSeen ? "Mark as unseen" : "Mark as seen"}
-                    handlePress={handleSeenToggle}
+                    title={isSeen ? "Unseen" : "Seen"}
+                    icon={isSeen ? icons.eyeFill : icons.eye}
+                    handlePress={() => handleToggle(isSeen, "seen")}
                     color="secondary"
                     containerStyle="mt-2 flex-1 mr-2"
                     textSyle=""
-                    disabled={false}
+                    disabled={isLoading}
                   />
                   <Button
                     title={isFavorite ? "Unfavorite" : "Favorite"}
                     icon={isFavorite ? icons.starFill : icons.star}
-                    handlePress={handleFavoriteToggle}
+                    handlePress={() => handleToggle(isFavorite, "favorite")}
                     color="secondary"
                     containerStyle="mt-2 flex-1 ml-2"
                     textSyle=""

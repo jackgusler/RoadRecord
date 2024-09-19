@@ -25,6 +25,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/license-plates/search', [LicensePlateController::class, 'search']);
     Route::get('/license-plates/state/{state}', [LicensePlateController::class, 'getByState']);
     Route::get('/license-plates/id/{id}', [LicensePlateController::class, 'show']);
+    Route::get('/license-plates/user/{userId}', [LicensePlateController::class, 'getByUser']);
 
     Route::get('/user/{userId}/license-plates', [UserLicensePlateController::class, 'getLicensePlatesByUser']);
     Route::get('/user/license-plate/{id}', [UserLicensePlateController::class, 'getUserLicensePlate']);
