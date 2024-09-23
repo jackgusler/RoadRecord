@@ -3,59 +3,64 @@
 namespace App\Http\Controllers;
 
 use App\Models\UserLicensePlate;
+use App\Models\LicensePlate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
 
 class UserLicensePlateController extends Controller
 {
-    // Get license plates based on user
-    public function getLicensePlatesByUser($userId)
+    // Get user license plates based on user
+    public function getLicensePlatesByUser()
     {
+        $userId = Auth::id();
+
         $licensePlates = UserLicensePlate::where('user_id', $userId)->get();
         return response()->json($licensePlates);
     }
 
+    // Get user license plates details
+    public function getLicensePlatesDetailsByUser()
+    {
+        $userId = Auth::id();
+
+        $licensePlatesIds = UserLicensePlate::where('user_id', $userId)->pluck('license_plate_id');
+        $licensePlates = LicensePlate::whereIn('id', $licensePlatesIds)->orderBy('plate_name', 'asc')->get();
+
+        return response()->json($licensePlates);
+    }
+
+    // Get user license plates states
+    public function getLicensePlatesStateByUser()
+    {
+        $userId = Auth::id();
+
+        $licensePlate = UserLicensePlate::where('user_id', $userId)->pluck('license_plate_id');
+        $licensePlatesStates = LicensePlate::whereIn('id', $licensePlate)->pluck('state')->unique();
+
+        return response()->json($licensePlatesStates);
+    }
+
+    // Get user license plates details by state
+    public function getLicensePlatesDetailsByUserAndState($state)
+    {
+        $userId = Auth::id();
+
+        $licensePlatesIds = UserLicensePlate::where('user_id', $userId)->pluck('license_plate_id');
+        $licensePlates = LicensePlate::whereIn('id', $licensePlatesIds)->where('state', $state)->get();
+
+        return response()->json($licensePlates);
+    }
+
     // Get user license plate based on license plate id
-    public function getUserLicensePlate($id)
+    public function getUserLicensePlateById($id)
     {
         $userLicensePlate = UserLicensePlate::findOrFail($id);
         return response()->json($userLicensePlate);
     }
 
-    // Batch update license plates
-    public function batchUpdate(Request $request)
-    {
-        $userSelections = $request->userSelections;
-        try {
-            foreach ($userSelections as $id => $selection) {
-                $selection = json_decode($selection, true);
-                $favorite = $selection['favorite'];
-                $seen = $selection['seen'];
-
-                if ($favorite) {
-                    $this->favoriteLicensePlate($id);
-                } else {
-                    $this->unfavoriteLicensePlate($id);
-                }
-
-                if ($seen) {
-                    $this->seenLicensePlate($id);
-                } else {
-                    $this->unseenLicensePlate($id);
-                }
-            }
-
-            return response()->json(['message' => 'License plates batch updated successfully']);
-        } catch (\Exception $e) {
-            Log::error($e->getMessage());
-            return response()->json(['message' => 'Error updating license plates'], 500);
-        }
-    }
-
     // Favorite a license plate
-    public function favoriteLicensePlate($id)
+    public function favoriteUserLicensePlate($id)
     {
         $userId = Auth::id();
 
@@ -83,7 +88,7 @@ class UserLicensePlateController extends Controller
     }
 
     // Unfavorite a license plate
-    public function unfavoriteLicensePlate($id)
+    public function unfavoriteUserLicensePlate($id)
     {
         $userId = Auth::id();
 
@@ -110,7 +115,7 @@ class UserLicensePlateController extends Controller
     }
 
     // Mark a license plate as seen (add to user_lp)
-    public function seenLicensePlate($id)
+    public function seenUserLicensePlate($id)
     {
         $userId = Auth::id();
 
@@ -138,7 +143,7 @@ class UserLicensePlateController extends Controller
     }
 
     // Remove a license plate from user_lp (unseen)
-    public function unseenLicensePlate($id)
+    public function unseenUserLicensePlate($id)
     {
         $userId = Auth::id();
 
@@ -162,5 +167,35 @@ class UserLicensePlateController extends Controller
             ->delete();
 
         return response()->json(['message' => 'License plate removed from user_lp']);
+    }
+
+    // Batch update license plates
+    public function batchUpdateUserLicensePlates(Request $request)
+    {
+        $userSelections = $request->userSelections;
+        try {
+            foreach ($userSelections as $id => $selection) {
+                $selection = json_decode($selection, true);
+                $favorite = $selection['favorite'];
+                $seen = $selection['seen'];
+
+                if ($favorite) {
+                    $this->favoriteUserLicensePlate($id);
+                } else {
+                    $this->unfavoriteUserLicensePlate($id);
+                }
+
+                if ($seen) {
+                    $this->seenUserLicensePlate($id);
+                } else {
+                    $this->unseenUserLicensePlate($id);
+                }
+            }
+
+            return response()->json(['message' => 'License plates batch updated successfully']);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return response()->json(['message' => 'Error updating license plates'], 500);
+        }
     }
 }

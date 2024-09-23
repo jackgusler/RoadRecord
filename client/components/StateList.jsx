@@ -10,14 +10,21 @@ import SelectedLicensePlateCard from "./SelectedLicensePlateCard";
 import Button from "./Button";
 import { useGlobalContext } from "../context/AuthContext";
 import { useEffect, useState } from "react";
-import { batchUpdateLicensePlates } from "../services/userLicensePlateService";
-import { getLicensePlatesByState } from "../services/licensePlateService";
+import {
+  batchUpdateLicensePlates,
+  getLicensePlatesDetailsByUser,
+  getLicensePlatesDetailsByUserAndState,
+} from "../services/userLicensePlateService";
+import {
+  getAllLicensePlates,
+  getLicensePlatesByState,
+} from "../services/licensePlateService";
 
 const StateList = ({ state, type }) => {
-  const { userLicensePlatesDetails, fetchLicensePlates } = useGlobalContext();
+  const { isLoading, setIsLoading, fetchLicensePlates } = useGlobalContext();
 
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [selectedPlates, setSelectedPlates] = useState([]);
   const [isSelectionMode, setIsSelectionMode] = useState(false);
@@ -27,43 +34,87 @@ const StateList = ({ state, type }) => {
   const [licensePlates, setLicensePlates] = useState([]);
 
   useEffect(() => {
+    const fetchStateLicensePlates = async () => {
+      if (licensePlates.length <= 0) {
+        setIsLoading(true);
+      } else {
+        setFetchLoading(true);
+      }
+      if (state.abbreviation === "ALL") {
+        try {
+          const data = await getAllLicensePlates(page, 24);
+          setLicensePlates((prevPlates) => [...prevPlates, ...data.data]);
+          if (data.data.length < 24) {
+            setHasMore(false);
+          }
+        } catch (error) {
+          console.error("Error fetching license plates:", error);
+        }
+        setIsLoading(false);
+        setFetchLoading(false);
+      } else {
+        try {
+          const data = await getLicensePlatesByState(
+            state.abbreviation,
+            page,
+            24
+          );
+          setLicensePlates((prevPlates) => [...prevPlates, ...data.data]);
+          if (data.data.length < 24) {
+            setHasMore(false);
+          }
+        } catch (error) {
+          console.error("Error fetching license plates:", error);
+        } finally {
+          setIsLoading(false);
+          setFetchLoading(false);
+        }
+      }
+    };
+
     if (type === "home") {
       fetchStateLicensePlates();
     }
   }, [page]);
 
   useEffect(() => {
-    if (type === "profile") {
+    const fetchUserLicensePlates = async () => {
+      setIsLoading(true);
       if (state.abbreviation === "ALL") {
-        setLicensePlates(
-          [...userLicensePlatesDetails].sort((a, b) =>
-            a.plate_title.localeCompare(b.plate_title)
-          )
-        );
+        try {
+          const data = await getLicensePlatesDetailsByUser(page, 24);
+          setLicensePlates((prevPlates) => [...prevPlates, ...data]);
+          if (data.length < 24) {
+            setHasMore(false);
+          }
+        } catch (error) {
+          console.error("Error fetching license plates:", error);
+        } finally {
+          setIsLoading(false);
+        }
       } else {
-        setLicensePlates(
-          userLicensePlatesDetails.filter(
-            (plate) => plate.state === state.abbreviation
-          )
-        );
+        try {
+          const data = await getLicensePlatesDetailsByUserAndState(
+            state.abbreviation,
+            page,
+            24
+          );
+          setLicensePlates((prevPlates) => [...prevPlates, ...data]);
+          if (data.length < 24) {
+            setHasMore(false);
+          }
+        } catch (error) {
+          console.error("Error fetching license plates:", error);
+        } finally {
+          setIsLoading(false);
+        }
       }
-    }
-  }, [state.abbreviation, userLicensePlatesDetails]);
+    };
 
-  const fetchStateLicensePlates = async () => {
-    setLoading(true);
-    try {
-      const data = await getLicensePlatesByState(state.abbreviation, page, 24);
-      setLicensePlates((prevPlates) => [...prevPlates, ...data.data]);
-      if (data.data.length < 24) {
-        setHasMore(false);
-      }
-    } catch (error) {
-      console.error("Error fetching license plates:", error);
-    } finally {
-      setLoading(false);
+    if (type === "profile") {
+      fetchUserLicensePlates();
     }
-  };
+  }, [state.abbreviation]);
 
   const loadMore = () => {
     if (hasMore) {
@@ -113,7 +164,7 @@ const StateList = ({ state, type }) => {
   };
 
   const handleConfirm = () => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       batchUpdateLicensePlates(userSelections);
       fetchLicensePlates();
@@ -124,7 +175,7 @@ const StateList = ({ state, type }) => {
     } catch (error) {
       console.error("Error updating license plates:", error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -147,7 +198,17 @@ const StateList = ({ state, type }) => {
         <View
           className={`w-[100%] h-[100%] flex-1 ml-1 ${type === "home" ? "mb-32" : ""}`}
         >
-          {licensePlates.length > 0 ? (
+          {isLoading ? (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Flow size={48} color="#92AD94" />
+            </View>
+          ) : licensePlates.length > 0 ? (
             <FlatList
               data={licensePlates}
               renderItem={({ item }) => {
@@ -172,7 +233,7 @@ const StateList = ({ state, type }) => {
               ItemSeparatorComponent={() => <View style={{ height: 5 }} />}
               ListHeaderComponent={() => <View style={{ paddingTop: 10 }} />}
               ListFooterComponent={
-                loading ? (
+                fetchLoading ? (
                   <View
                     style={{
                       alignItems: "center",
@@ -227,7 +288,6 @@ const StateList = ({ state, type }) => {
           </LinearGradient>
         )}
       </SafeAreaView>
-
       <CustomModal isVisible={isModalVisible} onClose={toggleModal}>
         <View className="max-h-96">
           <Text className="text-primary font-ubold text-2xl text-center">

@@ -1,42 +1,50 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { View, FlatList } from "react-native";
 import { useGlobalContext } from "../../../context/AuthContext";
-
 import { useFocusEffect } from "expo-router";
 import StateButton from "../../../components/StateButton";
+import { getLicensePlatesStatesByUser } from "../../../services/userLicensePlateService";
 import states from "../../../assets/data/states";
 
 const Profile = () => {
-  const { userLicensePlatesDetails, fetchLicensePlates } = useGlobalContext();
+  const { isLoading, setIsLoading } = useGlobalContext();
+  const [userStates, setUserStates] = useState([]);
 
   useFocusEffect(
     useCallback(() => {
-      fetchLicensePlates();
+      const fetchUserStates = async () => {
+        setIsLoading(true);
+        try {
+          const data = await getLicensePlatesStatesByUser();
+          const mappedStates = [
+            states[0], // Push states[0] initially
+            ...Object.values(data).map((abbreviation) => {
+              const state = states.find((state) => state.abbreviation === abbreviation);
+              return state ? state : { name: "Unknown", abbreviation };
+            }),
+          ];
+          setUserStates(mappedStates);
+        } catch (error) {
+          console.error("Error fetching user states:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchUserStates();
     }, [])
   );
 
-  const userStatesSet = new Set(
-    userLicensePlatesDetails.map((plate) => plate.state)
-  );
-
-  const userStates = [
-    { name: "All", abbreviation: "ALL" },
-    ...[...userStatesSet].map((abbreviation) => {
-      const state = states.find((state) => state.abbreviation === abbreviation);
-      return state
-        ? { name: state.name, abbreviation: state.abbreviation }
-        : { name: abbreviation, abbreviation };
-    }),
-  ];
-
   return (
-    <View className="bg-primary flex-1 px-4">
+    <View className="bg-primary flex-1 px-4 pt-[10]">
       <FlatList
         data={userStates}
-        renderItem={({ item }) => <StateButton state={item} type={"profile"} />}
+        renderItem={({ item, index }) => (
+          <View style={index === 0 ? { paddingTop: 0 } : { paddingTop: 10 }}>
+            <StateButton state={item} type={"profile"} />
+          </View>
+        )}
         keyExtractor={(item) => item.abbreviation}
-        ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-        ListHeaderComponent={() => <View style={{ paddingTop: 10 }} />}
         ListFooterComponent={() => <View style={{ paddingBottom: 96 }} />}
         showsVerticalScrollIndicator={false}
       />

@@ -1,10 +1,8 @@
 import { Text, View, TouchableOpacity } from "react-native";
 import React from "react";
 import { useRouter, usePathname } from "expo-router";
-import { useGlobalContext } from "../context/AuthContext";
 
 const StateButton = ({ state, type }) => {
-  const { fetchLicensePlates } = useGlobalContext();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -17,9 +15,6 @@ const StateButton = ({ state, type }) => {
     if (pathname.includes("/states")) {
       router.back();
     } else {
-      if (type === "home") {
-        fetchLicensePlates();
-      }
       router.push({
         pathname: basePath,
         params: { state: encodeURIComponent(JSON.stringify(state)) },

@@ -42,18 +42,18 @@ const LicensePlateCard = ({
     try {
       if (toggleType === "favorite") {
         if (isToggled) {
-          await userLP.unfavoriteLicensePlate(plate.id);
+          await userLP.unfavoriteUserLicensePlate(plate.id);
           setIsFavorite(false);
         } else {
-          await userLP.favoriteLicensePlate(plate.id);
+          await userLP.favoriteUserLicensePlate(plate.id);
           setIsFavorite(true);
         }
       } else if (toggleType === "seen") {
         if (isToggled) {
-          await userLP.unseenLicensePlate(plate.id);
+          await userLP.unseenUserLicensePlate(plate.id);
           setIsSeen(false);
         } else {
-          await userLP.seenLicensePlate(plate.id);
+          await userLP.seenUserLicensePlate(plate.id);
           setIsSeen(true);
         }
       }

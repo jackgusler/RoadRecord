@@ -21,17 +21,19 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::patch('/users/{id}', [UserController::class, 'update']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
-    Route::get('/license-plates', [LicensePlateController::class, 'index']);
-    Route::get('/license-plates/search', [LicensePlateController::class, 'search']);
-    Route::get('/license-plates/state/{state}', [LicensePlateController::class, 'getByState']);
-    Route::get('/license-plates/id/{id}', [LicensePlateController::class, 'show']);
-    Route::get('/license-plates/user/{userId}', [LicensePlateController::class, 'getByUser']);
+    Route::get('/license-plates', [LicensePlateController::class, 'getAllLicensePlates']);
+    Route::get('/license-plates/search', [LicensePlateController::class, 'searchLicensePlates']);
+    Route::get('/license-plates/id/{id}', [LicensePlateController::class, 'getLicensePlateById']);
+    Route::get('/license-plates/state/{state}', [LicensePlateController::class, 'getLicensePlatesByState']);
 
-    Route::get('/user/{userId}/license-plates', [UserLicensePlateController::class, 'getLicensePlatesByUser']);
-    Route::get('/user/license-plate/{id}', [UserLicensePlateController::class, 'getUserLicensePlate']);
-    Route::post('/license-plate/batch-update', [UserLicensePlateController::class, 'batchUpdate']);
-    Route::post('/license-plate/{id}/favorite', [UserLicensePlateController::class, 'favoriteLicensePlate']);
-    Route::post('/license-plate/{id}/unfavorite', [UserLicensePlateController::class, 'unfavoriteLicensePlate']);
-    Route::post('/license-plate/{id}/seen', [UserLicensePlateController::class, 'seenLicensePlate']);
-    Route::delete('/license-plate/{id}/unseen', [UserLicensePlateController::class, 'unseenLicensePlate']);
+    Route::get('/user/license-plates', [UserLicensePlateController::class, 'getLicensePlatesByUser']);
+    Route::get('/user/license-plates/details', [UserLicensePlateController::class, 'getLicensePlatesDetailsByUser']);
+    Route::get('/user/license-plates/states', [UserLicensePlateController::class, 'getLicensePlatesStateByUser']);
+    Route::get('/user/license-plates/details/state/{state}', [UserLicensePlateController::class, 'getLicensePlatesDetailsByUserAndState']);
+    Route::get('/user/license-plates/{id}', [UserLicensePlateController::class, 'getUserLicensePlateById']);
+    Route::post('/user/license-plates/{id}/favorite', [UserLicensePlateController::class, 'favoriteUserLicensePlate']);
+    Route::post('/user/license-plates/{id}/unfavorite', [UserLicensePlateController::class, 'unfavoriteUserLicensePlate']);
+    Route::post('/user/license-plates/{id}/seen', [UserLicensePlateController::class, 'seenUserLicensePlate']);
+    Route::post('/user/license-plates/{id}/unseen', [UserLicensePlateController::class, 'unseenUserLicensePlate']);
+    Route::post('/user/license-plates/batch-update', [UserLicensePlateController::class, 'batchUpdateUserLicensePlates']);
 });

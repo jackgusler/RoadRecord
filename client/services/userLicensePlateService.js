@@ -1,19 +1,64 @@
 import api from "./api";
 
-export const getLicensePlatesByUser = async (userId) => {
+export const getLicensePlatesByUser = async () => {
   try {
-    const response = await api.get(`/user/${userId}/license-plates`);
+    const response = await api.get("/user/license-plates");
     return response.data;
   } catch (error) {
     console.error(
-      `Error fetching license plates for user with id ${userId}:`,
+      `Error fetching license plates for user:`,
       error.response ? error.response.data : error.message
     );
     throw error;
   }
 };
 
-export const getUserLicensePlate = async (id) => {
+export const getLicensePlatesStatesByUser = async () => {
+  try {
+    const response = await api.get("/user/license-plates/states");
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Error fetching license plates states for user:`,
+      error.response ? error.response.data : error.message
+    );
+    throw error;
+  }
+};
+
+export const getLicensePlatesDetailsByUser = async () => {
+  try {
+    const response = await api.get("/user/license-plates/details");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching license plates:", error);
+    throw error;
+  }
+};
+
+export const getLicensePlatesDetailsByUserAndState = async (
+  state,
+  page = 1,
+  perPage = 10
+) => {
+  try {
+    const response = await api.get(
+      `/user/license-plates/details/state/${state}`,
+      {
+        params: { page, per_page: perPage },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Error fetching license plates for user and state ${state}:`,
+      error.response ? error.response.data : error.message
+    );
+    throw error;
+  }
+};
+
+export const getUserLicensePlateById = async (id) => {
   try {
     const response = await api.get(`/user/license-plate/${id}`);
     return response.data;
@@ -23,30 +68,9 @@ export const getUserLicensePlate = async (id) => {
   }
 };
 
-export const batchUpdateLicensePlates = async (userSelections) => {
+export const favoriteUserLicensePlate = async (id) => {
   try {
-    // Convert userSelections object to FormData
-    const formData = new FormData();
-    for (const [key, value] of Object.entries(userSelections)) {
-      formData.append(`userSelections[${key}]`, JSON.stringify(value));
-    }
-
-    const response = await api.post(`/license-plate/batch-update`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
-    return response.data;
-  } catch (error) {
-    console.error(`Error batch updating license plates:`, error);
-    throw error;
-  }
-};
-
-export const favoriteLicensePlate = async (id) => {
-  try {
-    const response = await api.post(`/license-plate/${id}/favorite`);
+    const response = await api.post(`/user/license-plate/${id}/favorite`);
     return response.data;
   } catch (error) {
     console.error(`Error favoriting license plate with id ${id}:`, error);
@@ -54,9 +78,9 @@ export const favoriteLicensePlate = async (id) => {
   }
 };
 
-export const unfavoriteLicensePlate = async (id) => {
+export const unfavoriteUserLicensePlate = async (id) => {
   try {
-    const response = await api.post(`/license-plate/${id}/unfavorite`);
+    const response = await api.post(`/user/license-plate/${id}/unfavorite`);
     return response.data;
   } catch (error) {
     console.error(`Error unfavoriting license plate with id ${id}:`, error);
@@ -64,9 +88,9 @@ export const unfavoriteLicensePlate = async (id) => {
   }
 };
 
-export const seenLicensePlate = async (id) => {
+export const seenUserLicensePlate = async (id) => {
   try {
-    const response = await api.post(`/license-plate/${id}/seen`);
+    const response = await api.post(`/user/license-plate/${id}/seen`);
     return response.data;
   } catch (error) {
     console.error(
@@ -77,15 +101,40 @@ export const seenLicensePlate = async (id) => {
   }
 };
 
-export const unseenLicensePlate = async (id) => {
+export const unseenUserLicensePlate = async (id) => {
   try {
-    const response = await api.delete(`/license-plate/${id}/unseen`);
+    const response = await api.post(`/user/license-plate/${id}/unseen`);
     return response.data;
   } catch (error) {
     console.error(
       `Error marking license plate with id ${id} as unseen:`,
       error
     );
+    throw error;
+  }
+};
+
+export const batchUpdateUserLicensePlates = async (userSelections) => {
+  try {
+    // Convert userSelections object to FormData
+    const formData = new FormData();
+    for (const [key, value] of Object.entries(userSelections)) {
+      formData.append(`userSelections[${key}]`, JSON.stringify(value));
+    }
+
+    const response = await api.post(
+      `/user/license-plate/batch-update`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(`Error batch updating license plates:`, error);
     throw error;
   }
 };
