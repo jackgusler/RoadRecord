@@ -8,6 +8,7 @@ module.exports = {
         secondary: "#92AD94", // Soft Green
         accent: "#F5FBEF", // Light Beige
         muted: "#748B75", // Muted Olive
+        mutedLight: "#859986", // Soft Green
         dark: "#503D42", // Deep Brown
 
         // primary: "#839788",
@@ -19,15 +20,15 @@ module.exports = {
       },
     },
     fontFamily: {
-      athin: ["Archivo-Thin", "sans-serif"],
-      aextralight: ["Archivo-ExtraLight", "sans-serif"],
-      alight: ["Archivo-Light", "sans-serif"],
-      aregular: ["Archivo-Regular", "sans-serif"],
-      amedium: ["Archivo-Medium", "sans-serif"],
-      asemibold: ["Archivo-SemiBold", "sans-serif"],
-      abold: ["Archivo-Bold", "sans-serif"],
-      aextrabold: ["Archivo-ExtraBold", "sans-serif"],
-      ablack: ["Archivo-Black", "sans-serif"],
+      uthin: ["Urbanist-Thin", "sans-serif"],
+      uextralight: ["Urbanist-ExtraLight", "sans-serif"],
+      ulight: ["Urbanist-Light", "sans-serif"],
+      uregular: ["Urbanist-Regular", "sans-serif"],
+      umedium: ["Urbanist-Medium", "sans-serif"],
+      usemibold: ["Urbanist-SemiBold", "sans-serif"],
+      ubold: ["Urbanist-Bold", "sans-serif"],
+      uextrabold: ["Urbanist-ExtraBold", "sans-serif"],
+      ublack: ["Urbanist-Black", "sans-serif"],
     },
   },
   plugins: [],
