@@ -23,6 +23,27 @@ export const getUserLicensePlate = async (id) => {
   }
 };
 
+export const batchUpdateLicensePlates = async (userSelections) => {
+  try {
+    // Convert userSelections object to FormData
+    const formData = new FormData();
+    for (const [key, value] of Object.entries(userSelections)) {
+      formData.append(`userSelections[${key}]`, JSON.stringify(value));
+    }
+
+    const response = await api.post(`/license-plate/batch-update`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error(`Error batch updating license plates:`, error);
+    throw error;
+  }
+};
+
 export const favoriteLicensePlate = async (id) => {
   try {
     const response = await api.post(`/license-plate/${id}/favorite`);

@@ -43,7 +43,7 @@ const SignIn = () => {
     <SafeAreaView className="flex-1 bg-accent">
       <View className="flex-1 justify-between">
         <View className="items-center">
-          <Text className="text-4xl font-abold text-primary my-8">Sign in</Text>
+          <Text className="text-4xl font-ubold text-primary my-8">Sign in</Text>
         </View>
         <KeyboardAwareScrollView
           className="flex-1 px-4"
@@ -80,7 +80,12 @@ const SignIn = () => {
           />
         </KeyboardAwareScrollView>
         <View className="px-4 mb-4">
-          <Button title="Sign in" handlePress={handleSignIn} color="primary" />
+          <Button
+            title="Sign in"
+            handlePress={handleSignIn}
+            color="primary"
+            textSyle={"text-lg"}
+          />
         </View>
       </View>
     </SafeAreaView>

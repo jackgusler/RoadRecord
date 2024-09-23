@@ -11,7 +11,6 @@ use Intervention\Image\ImageManager;
 class AuthController extends Controller
 {
     // User sign in
-    // User sign in
     public function signIn(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -105,7 +104,7 @@ class AuthController extends Controller
             // Convert the image to a blob
             $image = $background->toPng();
 
-            // Convert the image to a blob
+            // Save the image to the user data
             $userData['profile_img'] = (string) $image;
         }
 

@@ -18,6 +18,7 @@ export default function App() {
           title="Sign in"
           handlePress={() => router.push("/sign-in")}
           color="secondary"
+          textSyle={"text-lg"}
         />
       </View>
       <View className="p-4">
@@ -25,6 +26,7 @@ export default function App() {
           title="Sign up"
           handlePress={() => router.push("/sign-up")}
           color="secondary"
+          textSyle={"text-lg"}
         />
       </View>
     </SafeAreaView>

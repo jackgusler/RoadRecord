@@ -30,7 +30,7 @@ const StateButton = ({ state, type }) => {
   return (
     <TouchableOpacity activeOpacity={0.7} onPress={handlePress}>
       <View className="w-100 bg-muted rounded-md border-2 border-secondary items-center">
-        <Text className="font-abold text-3xl text-primary p-4">
+        <Text className="font-ubold text-3xl text-primary p-4">
           {state.name}
         </Text>
       </View>

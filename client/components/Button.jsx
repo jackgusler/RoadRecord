@@ -12,13 +12,13 @@ const Button = ({
 }) => {
   return (
     <TouchableOpacity
-      className={`bg-${color} rounded-xl min-h-[62px] min-w-[100px] justify-center items-center ${containerStyle}`}
+      className={`bg-${color} rounded-xl h-[62px] w-[100px] justify-center items-center ${containerStyle}`}
       onPress={handlePress}
       activeOpacity={0.7}
       disabled={disabled}
     >
       <View className="flex-row items-center justify-center">
-        <Text className={`text-accent text-lg font-asemibold ${textSyle}`}>
+        <Text className={`text-accent font-usemibold ${textSyle}`}>
           {title}
         </Text>
         {icon ? (

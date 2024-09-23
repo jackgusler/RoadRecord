@@ -48,7 +48,7 @@ const CustomTextInput = forwardRef(
             className={`flex-row items-center border-2 rounded-2xl overflow-hidden border-secondary ${search ? "bg-primary" : ""}`}
           >
             <TextInput
-              className={`flex-1 px-4 font-asemibold bg-primary ${inputStyles}`}
+              className={`flex-1 px-4 font-usemibold bg-primary ${inputStyles}`}
               placeholder={placeholder}
               placeholderTextColor={textColor}
               onChangeText={handleChangeText}

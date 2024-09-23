@@ -74,7 +74,7 @@ const ProfileHeader = () => {
   return (
     <View className="bg-primary pt-36">
       <View className="flex items-center">
-        <Text className="font-abold text-4xl text-accent mb-2">
+        <Text className="font-ubold text-4xl text-accent mb-2">
           {user.first_name} {user.last_name}
         </Text>
         <View className="relative">
@@ -91,7 +91,7 @@ const ProfileHeader = () => {
             positionStyles="absolute bottom-0 right-0 rounded-full border-4 border-accent "
           />
         </View>
-        <Text className="font-abold text-2xl text-accent">
+        <Text className="font-ubold text-2xl text-accent">
           @{user.username}
         </Text>
       </View>

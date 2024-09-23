@@ -1,29 +1,31 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   StyleSheet,
-  Modal,
   TouchableOpacity,
   Alert,
-  Animated,
-  TouchableWithoutFeedback,
+  Image,
 } from "react-native";
-import { Image } from "expo-image";
 import Button from "./Button";
 import { icons } from "../constants";
 import * as userLP from "../services/userLicensePlateService";
 import { useGlobalContext } from "../context/AuthContext";
+import CustomModal from "./CustomModal";
 
-const LicensePlateCard = ({ plate }) => {
+const LicensePlateCard = ({
+  plate,
+  isSelected,
+  onSelect,
+  isSelectionMode,
+  onLongPress,
+}) => {
   const { userLicensePlates, fetchLicensePlates, isLoading } =
     useGlobalContext();
 
-  const [isFavorite, setIsFavorite] = useState();
   const [isSeen, setIsSeen] = useState();
-  const [modalVisible, setModalVisible] = useState(false);
+  const [isFavorite, setIsFavorite] = useState();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const opacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const favorite = userLicensePlates.find(
@@ -62,118 +64,90 @@ const LicensePlateCard = ({ plate }) => {
   };
 
   const toggleModal = () => {
-    if (modalVisible) {
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start(() => {
-        setModalVisible(false);
-        setIsModalVisible(false);
-      });
-    } else {
-      setModalVisible(true);
-      setIsModalVisible(true);
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    }
+    setIsModalVisible(!isModalVisible);
   };
-
-  useEffect(() => {
-    if (modalVisible) {
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    } else {
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start(() => setIsModalVisible(false));
-    }
-  }, [modalVisible]);
 
   return (
     <>
-      <TouchableOpacity onPress={toggleModal}>
-        <View className="bg-accent rounded-lg">
+      <View className="relative">
+        {isSelectionMode && (
+          <View className="absolute top-1 left-1 z-10">
+            <View className="bg-accent rounded-full w-4 h-4 flex items-center justify-center">
+              <Image
+                className="w-6 h-6"
+                source={isSelected ? icons.checkFill : icons.plus}
+                tintColor={"#0B3142"}
+              />
+            </View>
+          </View>
+        )}
+        <TouchableOpacity
+          onPress={() => {
+            if (isSelectionMode) {
+              onSelect(plate.id);
+            } else {
+              toggleModal();
+            }
+          }}
+          onLongPress={() => {
+            onLongPress();
+            onSelect(plate.id);
+          }}
+          style={{
+            opacity: isSelectionMode && !isSelected ? 0.5 : 1,
+          }}
+        >
+          <View className="bg-accent rounded-lg relative">
+            <Image
+              source={{ uri: `data:image/png;base64,${plate.plate_img}` }}
+              className="w-32 h-16 rounded-lg"
+              contentFit="cover"
+            />
+            <Text
+              className="text-primary font-ubold text-sm text-center w-32 px-1"
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {plate.plate_title}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      <CustomModal isVisible={isModalVisible} onClose={toggleModal}>
+        <View className="content-center items-center">
           <Image
             source={{ uri: `data:image/png;base64,${plate.plate_img}` }}
-            className="w-32 h-16 rounded-lg grayscale-"
+            className="w-[310] h-[155] rounded-2xl"
             contentFit="cover"
-            blurRadius={0.5}
           />
-          <Text
-            className="text-primary font-abold text-sm text-center w-32 px-1"
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
+          <Text className="text-primary font-ubold text-2xl text-center mt-2">
             {plate.plate_title}
           </Text>
         </View>
-      </TouchableOpacity>
-
-      <Modal
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={toggleModal}
-      >
-        <TouchableWithoutFeedback onPress={toggleModal}>
-          <Animated.View style={[styles.modalBackground, { opacity }]}>
-            <TouchableWithoutFeedback>
-              <View className="w-[350] bg-accent rounded-lg p-4">
-                <View className="content-center items-center">
-                  <Image
-                    source={{ uri: `data:image/png;base64,${plate.plate_img}` }}
-                    className="w-[310] h-[155] rounded-2xl"
-                    contentFit="cover"
-                    blurRadius={50}
-                  />
-                  <Text className="text-primary font-abold text-2xl text-center mt-2">
-                    {plate.plate_title}
-                  </Text>
-                </View>
-                <View className="flex-row justify-between w-100">
-                  <Button
-                    title={isSeen ? "Unseen" : "Seen"}
-                    icon={isSeen ? icons.eyeFill : icons.eye}
-                    handlePress={() => handleToggle(isSeen, "seen")}
-                    color="secondary"
-                    containerStyle="mt-2 flex-1 mr-2"
-                    textSyle=""
-                    disabled={isLoading}
-                  />
-                  <Button
-                    title={isFavorite ? "Unfavorite" : "Favorite"}
-                    icon={isFavorite ? icons.starFill : icons.star}
-                    handlePress={() => handleToggle(isFavorite, "favorite")}
-                    color="secondary"
-                    containerStyle="mt-2 flex-1 ml-2"
-                    textSyle=""
-                    disabled={false}
-                  />
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
-          </Animated.View>
-        </TouchableWithoutFeedback>
-      </Modal>
+        <View className="flex-row justify-between w-100">
+          <Button
+            title={isSeen ? "Unseen" : "Seen"}
+            icon={isSeen ? icons.eyeFill : icons.eye}
+            handlePress={() => handleToggle(isSeen, "seen")}
+            color="secondary"
+            containerStyle="mt-2 flex-1 mr-2"
+            textSyle={"text-lg"}
+            disabled={isLoading}
+          />
+          <Button
+            title={isFavorite ? "Unfavorite" : "Favorite"}
+            icon={isFavorite ? icons.starFill : icons.star}
+            handlePress={() => handleToggle(isFavorite, "favorite")}
+            color="secondary"
+            containerStyle="mt-2 flex-1 ml-2"
+            textSyle={"text-lg"}
+            disabled={false}
+          />
+        </View>
+      </CustomModal>
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  modalBackground: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-});
 
 export default LicensePlateCard;

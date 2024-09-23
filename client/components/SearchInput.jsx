@@ -64,7 +64,7 @@ const SearchInput = ({ initialQuery }) => {
   };
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+    const unsubscribe = navigation.addListener("beforeRemove", (e) => {
       // This event is triggered when the user navigates back
       console.log("Navigated back using gesture");
       // Call your method here
@@ -153,7 +153,7 @@ const SearchInput = ({ initialQuery }) => {
           <View style={styles.modalBackground}>
             <TouchableWithoutFeedback>
               <View className="w-[350] bg-accent rounded-lg p-4">
-                <Text className="text-primary font-abold text-2xl text-center mt-2">
+                <Text className="text-primary font-ubold text-2xl text-center mt-2">
                   Filter Options
                 </Text>
                 <Picker
@@ -193,7 +193,7 @@ const SearchInput = ({ initialQuery }) => {
                     handlePress={toggleModal}
                     color="secondary"
                     containerStyle="mt-2 flex-1 mr-2"
-                    textSyle=""
+                    textSyle={"text-lg"}
                     disabled={false}
                   />
                   <Button
@@ -201,7 +201,7 @@ const SearchInput = ({ initialQuery }) => {
                     handlePress={toggleModal}
                     color="secondary"
                     containerStyle="mt-2 flex-1 ml-2"
-                    textSyle=""
+                    textSyle={"text-lg"}
                     disabled={false}
                   />
                 </View>

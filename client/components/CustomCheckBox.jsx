@@ -6,7 +6,7 @@ const CustomCheckBox = ({ title = '', value = false, handleToggle = () => {} }) 
   return (
     <View>
       <CheckBox
-        title={<Text className="font-amedium">{title}</Text>}
+        title={<Text className="font-umedium">{title}</Text>}
         checked={value}
         onPress={handleToggle}
         checkedColor="#92AD94"

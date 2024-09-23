@@ -24,6 +24,36 @@ class UserLicensePlateController extends Controller
         return response()->json($userLicensePlate);
     }
 
+    // Batch update license plates
+    public function batchUpdate(Request $request)
+    {
+        $userSelections = $request->userSelections;
+        try {
+            foreach ($userSelections as $id => $selection) {
+                $selection = json_decode($selection, true);
+                $favorite = $selection['favorite'];
+                $seen = $selection['seen'];
+
+                if ($favorite) {
+                    $this->favoriteLicensePlate($id);
+                } else {
+                    $this->unfavoriteLicensePlate($id);
+                }
+
+                if ($seen) {
+                    $this->seenLicensePlate($id);
+                } else {
+                    $this->unseenLicensePlate($id);
+                }
+            }
+
+            return response()->json(['message' => 'License plates batch updated successfully']);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return response()->json(['message' => 'Error updating license plates'], 500);
+        }
+    }
+
     // Favorite a license plate
     public function favoriteLicensePlate($id)
     {

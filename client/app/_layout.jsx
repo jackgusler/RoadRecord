@@ -20,15 +20,15 @@ const Header = () => {
 
 const RootLayout = () => {
   const [fontsLoaded, error] = useFonts({
-    "Archivo-Black": require("../assets/fonts/Archivo-Black.ttf"),
-    "Archivo-Bold": require("../assets/fonts/Archivo-Bold.ttf"),
-    "Archivo-ExtraBold": require("../assets/fonts/Archivo-ExtraBold.ttf"),
-    "Archivo-ExtraLight": require("../assets/fonts/Archivo-ExtraLight.ttf"),
-    "Archivo-Light": require("../assets/fonts/Archivo-Light.ttf"),
-    "Archivo-Medium": require("../assets/fonts/Archivo-Medium.ttf"),
-    "Archivo-Regular": require("../assets/fonts/Archivo-Regular.ttf"),
-    "Archivo-SemiBold": require("../assets/fonts/Archivo-SemiBold.ttf"),
-    "Archivo-Thin": require("../assets/fonts/Archivo-Thin.ttf"),
+    "Urbanist-Black": require("../assets/fonts/Urbanist-Black.ttf"),
+    "Urbanist-Bold": require("../assets/fonts/Urbanist-Bold.ttf"),
+    "Urbanist-ExtraBold": require("../assets/fonts/Urbanist-ExtraBold.ttf"),
+    "Urbanist-ExtraLight": require("../assets/fonts/Urbanist-ExtraLight.ttf"),
+    "Urbanist-Light": require("../assets/fonts/Urbanist-Light.ttf"),
+    "Urbanist-Medium": require("../assets/fonts/Urbanist-Medium.ttf"),
+    "Urbanist-Regular": require("../assets/fonts/Urbanist-Regular.ttf"),
+    "Urbanist-SemiBold": require("../assets/fonts/Urbanist-SemiBold.ttf"),
+    "Urbanist-Thin": require("../assets/fonts/Urbanist-Thin.ttf"),
   });
 
   const segments = useSegments(); // Get current segments for navigation

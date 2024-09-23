@@ -30,21 +30,20 @@ export const getUser = async (id) => {
 export const updateUser = async (id, formData) => {
   try {
     // Append the `_method` field to the form data to simulate a PATCH request
-    formData.append('_method', 'PATCH');
+    formData.append("_method", "PATCH");
 
     const response = await api.post(`/users/${id}`, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
 
     return response.data;
   } catch (error) {
-    console.error('Error updating user:', error);
+    console.error("Error updating user:", error);
     throw error;
   }
 };
-
 
 export const deleteUser = async (id) => {
   try {

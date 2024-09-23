@@ -85,7 +85,7 @@ const SignUp = () => {
     <SafeAreaView className="flex-1 bg-accent">
       <View className="flex-1 justify-between">
         <View className="items-center">
-          <Text className="text-4xl font-abold text-primary my-8">Sign up</Text>
+          <Text className="text-4xl font-ubold text-primary my-8">Sign up</Text>
         </View>
         <KeyboardAwareScrollView
           className="flex-1 px-4"
@@ -101,8 +101,8 @@ const SignUp = () => {
                 handleChangeText={setFirstName}
                 value={first_name}
                 containerStyles="mb-4 w-full"
-            inputStyles="h-16"
-            textColor="#748B75"
+                inputStyles="h-16"
+                textColor="#748B75"
                 returnKeyType="next"
                 onSubmitEditing={() => lastNameRef.current.focus()}
                 blurOnSubmit={false}
@@ -116,8 +116,8 @@ const SignUp = () => {
                 handleChangeText={setLastName}
                 value={last_name}
                 containerStyles="mb-4 w-full"
-            inputStyles="h-16"
-            textColor="#748B75"
+                inputStyles="h-16"
+                textColor="#748B75"
                 returnKeyType="next"
                 onSubmitEditing={() => usernameRef.current.focus()}
                 blurOnSubmit={false}
@@ -181,7 +181,12 @@ const SignUp = () => {
           />
         </KeyboardAwareScrollView>
         <View className="px-4 mb-4">
-          <Button title="Sign up" handlePress={handleSignUp} color="primary" />
+          <Button
+            title="Sign up"
+            handlePress={handleSignUp}
+            color="primary"
+            textSyle={"text-lg"}
+          />
         </View>
       </View>
     </SafeAreaView>

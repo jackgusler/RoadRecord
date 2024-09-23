@@ -29,6 +29,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/user/{userId}/license-plates', [UserLicensePlateController::class, 'getLicensePlatesByUser']);
     Route::get('/user/license-plate/{id}', [UserLicensePlateController::class, 'getUserLicensePlate']);
+    Route::post('/license-plate/batch-update', [UserLicensePlateController::class, 'batchUpdate']);
     Route::post('/license-plate/{id}/favorite', [UserLicensePlateController::class, 'favoriteLicensePlate']);
     Route::post('/license-plate/{id}/unfavorite', [UserLicensePlateController::class, 'unfavoriteLicensePlate']);
     Route::post('/license-plate/{id}/seen', [UserLicensePlateController::class, 'seenLicensePlate']);

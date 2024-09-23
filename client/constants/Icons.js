@@ -9,6 +9,8 @@ import bellRing from "../assets/icons/bell-simple-ringing-duotone.png";
 import bellRingFill from "../assets/icons/bell-simple-ringing-fill.png";
 import camera from "../assets/icons/camera-duotone.png";
 import cameraFill from "../assets/icons/camera-fill.png";
+import check from "../assets/icons/check-circle-duotone.png";
+import checkFill from "../assets/icons/check-circle-fill.png";
 import eye from "../assets/icons/eye-slash-duotone.png";
 import eyeFill from "../assets/icons/eye-fill.png";
 import folders from "../assets/icons/folders-duotone.png";
@@ -54,6 +56,8 @@ export default {
   bellRingFill,
   camera,
   cameraFill,
+  check,
+  checkFill,
   eye,
   eyeFill,
   folders,
