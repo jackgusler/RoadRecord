@@ -60,7 +60,7 @@ export const getLicensePlatesDetailsByUserAndState = async (
 
 export const getUserLicensePlateById = async (id) => {
   try {
-    const response = await api.get(`/user/license-plate/${id}`);
+    const response = await api.get(`/user/license-plates/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching user license plate with id ${id}:`, error);
@@ -70,7 +70,7 @@ export const getUserLicensePlateById = async (id) => {
 
 export const favoriteUserLicensePlate = async (id) => {
   try {
-    const response = await api.post(`/user/license-plate/${id}/favorite`);
+    const response = await api.post(`/user/license-plates/${id}/favorite`);
     return response.data;
   } catch (error) {
     console.error(`Error favoriting license plate with id ${id}:`, error);
@@ -80,7 +80,7 @@ export const favoriteUserLicensePlate = async (id) => {
 
 export const unfavoriteUserLicensePlate = async (id) => {
   try {
-    const response = await api.post(`/user/license-plate/${id}/unfavorite`);
+    const response = await api.post(`/user/license-plates/${id}/unfavorite`);
     return response.data;
   } catch (error) {
     console.error(`Error unfavoriting license plate with id ${id}:`, error);
@@ -90,7 +90,7 @@ export const unfavoriteUserLicensePlate = async (id) => {
 
 export const seenUserLicensePlate = async (id) => {
   try {
-    const response = await api.post(`/user/license-plate/${id}/seen`);
+    const response = await api.post(`/user/license-plates/${id}/seen`);
     return response.data;
   } catch (error) {
     console.error(
@@ -103,7 +103,7 @@ export const seenUserLicensePlate = async (id) => {
 
 export const unseenUserLicensePlate = async (id) => {
   try {
-    const response = await api.post(`/user/license-plate/${id}/unseen`);
+    const response = await api.post(`/user/license-plates/${id}/unseen`);
     return response.data;
   } catch (error) {
     console.error(
@@ -123,7 +123,7 @@ export const batchUpdateUserLicensePlates = async (userSelections) => {
     }
 
     const response = await api.post(
-      `/user/license-plate/batch-update`,
+      `/user/license-plates/batch-update`,
       formData,
       {
         headers: {

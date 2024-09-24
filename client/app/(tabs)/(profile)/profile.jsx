@@ -5,6 +5,7 @@ import { useFocusEffect } from "expo-router";
 import StateButton from "../../../components/StateButton";
 import { getLicensePlatesStatesByUser } from "../../../services/userLicensePlateService";
 import states from "../../../assets/data/states";
+import { Flow } from "react-native-animated-spinkit";
 
 const Profile = () => {
   const { isLoading, setIsLoading } = useGlobalContext();
@@ -17,9 +18,11 @@ const Profile = () => {
         try {
           const data = await getLicensePlatesStatesByUser();
           const mappedStates = [
-            states[0], // Push states[0] initially
+            states[0], // All states
             ...Object.values(data).map((abbreviation) => {
-              const state = states.find((state) => state.abbreviation === abbreviation);
+              const state = states.find(
+                (state) => state.abbreviation === abbreviation
+              );
               return state ? state : { name: "Unknown", abbreviation };
             }),
           ];
@@ -37,17 +40,29 @@ const Profile = () => {
 
   return (
     <View className="bg-primary flex-1 px-4 pt-[10]">
-      <FlatList
-        data={userStates}
-        renderItem={({ item, index }) => (
-          <View style={index === 0 ? { paddingTop: 0 } : { paddingTop: 10 }}>
-            <StateButton state={item} type={"profile"} />
-          </View>
-        )}
-        keyExtractor={(item) => item.abbreviation}
-        ListFooterComponent={() => <View style={{ paddingBottom: 96 }} />}
-        showsVerticalScrollIndicator={false}
-      />
+      {isLoading ? (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Flow size={48} color="#92AD94" />
+        </View>
+      ) : (
+        <FlatList
+          data={userStates}
+          renderItem={({ item, index }) => (
+            <View style={index === 0 ? { paddingTop: 0 } : { paddingTop: 10 }}>
+              <StateButton state={item} type={"profile"} />
+            </View>
+          )}
+          keyExtractor={(item) => item.abbreviation}
+          ListFooterComponent={() => <View style={{ paddingBottom: 96 }} />}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </View>
   );
 };

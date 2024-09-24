@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
     if (user) {
       try {
         // Fetch license plates
-        const userPlates = await getLicensePlatesByUser(user.id);
+        const userPlates = await getLicensePlatesByUser();
         setUserLicensePlates(userPlates);
       } catch (error) {
         console.error("Error fetching license plates:", error);

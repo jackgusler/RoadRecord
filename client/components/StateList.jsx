@@ -11,7 +11,7 @@ import Button from "./Button";
 import { useGlobalContext } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import {
-  batchUpdateLicensePlates,
+  batchUpdateUserLicensePlates,
   getLicensePlatesDetailsByUser,
   getLicensePlatesDetailsByUserAndState,
 } from "../services/userLicensePlateService";
@@ -19,6 +19,7 @@ import {
   getAllLicensePlates,
   getLicensePlatesByState,
 } from "../services/licensePlateService";
+import { router } from "expo-router";
 
 const StateList = ({ state, type }) => {
   const { isLoading, setIsLoading, fetchLicensePlates } = useGlobalContext();
@@ -34,87 +35,85 @@ const StateList = ({ state, type }) => {
   const [licensePlates, setLicensePlates] = useState([]);
 
   useEffect(() => {
-    const fetchStateLicensePlates = async () => {
-      if (licensePlates.length <= 0) {
-        setIsLoading(true);
-      } else {
-        setFetchLoading(true);
-      }
-      if (state.abbreviation === "ALL") {
-        try {
-          const data = await getAllLicensePlates(page, 24);
-          setLicensePlates((prevPlates) => [...prevPlates, ...data.data]);
-          if (data.data.length < 24) {
-            setHasMore(false);
-          }
-        } catch (error) {
-          console.error("Error fetching license plates:", error);
-        }
-        setIsLoading(false);
-        setFetchLoading(false);
-      } else {
-        try {
-          const data = await getLicensePlatesByState(
-            state.abbreviation,
-            page,
-            24
-          );
-          setLicensePlates((prevPlates) => [...prevPlates, ...data.data]);
-          if (data.data.length < 24) {
-            setHasMore(false);
-          }
-        } catch (error) {
-          console.error("Error fetching license plates:", error);
-        } finally {
-          setIsLoading(false);
-          setFetchLoading(false);
-        }
-      }
-    };
-
     if (type === "home") {
-      fetchStateLicensePlates();
+      fetchStateLicensePlates(false);
     }
   }, [page]);
 
   useEffect(() => {
-    const fetchUserLicensePlates = async () => {
-      setIsLoading(true);
-      if (state.abbreviation === "ALL") {
-        try {
-          const data = await getLicensePlatesDetailsByUser(page, 24);
-          setLicensePlates((prevPlates) => [...prevPlates, ...data]);
-          if (data.length < 24) {
-            setHasMore(false);
-          }
-        } catch (error) {
-          console.error("Error fetching license plates:", error);
-        } finally {
-          setIsLoading(false);
-        }
+    if (type === "profile") {
+      fetchUserLicensePlates(false);
+    }
+  }, [state.abbreviation]);
+
+  const fetchStateLicensePlates = async (refresh) => {
+    const setLoadingState = (isLoading) => {
+      if (licensePlates.length <= 0) {
+        setIsLoading(isLoading);
       } else {
-        try {
-          const data = await getLicensePlatesDetailsByUserAndState(
-            state.abbreviation,
-            page,
-            24
-          );
-          setLicensePlates((prevPlates) => [...prevPlates, ...data]);
-          if (data.length < 24) {
-            setHasMore(false);
-          }
-        } catch (error) {
-          console.error("Error fetching license plates:", error);
-        } finally {
-          setIsLoading(false);
-        }
+        setFetchLoading(isLoading);
       }
     };
 
-    if (type === "profile") {
-      fetchUserLicensePlates();
+    setLoadingState(true);
+
+    try {
+      const fetchData =
+        state.abbreviation === "ALL"
+          ? getAllLicensePlates(page, 24)
+          : getLicensePlatesByState(state.abbreviation, page, 24);
+
+      const data = await fetchData;
+
+      if (refresh) {
+        setLicensePlates(data.data);
+      } else {
+        setLicensePlates((prevPlates) => [...prevPlates, ...data.data]);
+      }
+
+      if (data.data.length < 24) {
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error("Error fetching license plates:", error);
+    } finally {
+      setLoadingState(false);
     }
-  }, [state.abbreviation]);
+  };
+
+  const fetchUserLicensePlates = async (refresh) => {
+    setIsLoading(true);
+    try {
+      let data;
+      if (state.abbreviation === "ALL") {
+        data = await getLicensePlatesDetailsByUser(page, 24);
+      } else {
+        data = await getLicensePlatesDetailsByUserAndState(
+          state.abbreviation,
+          page,
+          24
+        );
+      }
+
+      if (refresh) {
+        setLicensePlates(data);
+      } else {
+        setLicensePlates((prevPlates) => [...prevPlates, ...data]);
+      }
+
+      if (data.length < 24) {
+        setHasMore(false);
+      }
+
+      if (data.length === 0) {
+        router.back();
+      }
+    } catch (error) {
+      console.error("Error fetching license plates:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const loadMore = () => {
     if (hasMore) {
@@ -126,7 +125,7 @@ const StateList = ({ state, type }) => {
     setSelectedPlates((prevSelected) => {
       const newSelected = prevSelected.includes(id)
         ? prevSelected.filter((plateId) => plateId !== id)
-        : [...prevSelected, id];
+        : [...prevSelected, id].sort((a, b) => a - b); // Ensure the list is sorted
 
       if (newSelected.length === 0) {
         setIsSelectionMode(false);
@@ -135,6 +134,7 @@ const StateList = ({ state, type }) => {
       return newSelected;
     });
   };
+
   const handleLongPress = () => {
     setIsSelectionMode(true);
   };
@@ -163,15 +163,18 @@ const StateList = ({ state, type }) => {
     }));
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
+    toggleModal();
+    setIsSelectionMode(false);
     setIsLoading(true);
     try {
-      batchUpdateLicensePlates(userSelections);
+      await batchUpdateUserLicensePlates(userSelections);
+      if (type === "profile") {
+        fetchUserLicensePlates(true);
+      }
       fetchLicensePlates();
-      toggleModal();
       setUserSelections({});
       setSelectedPlates([]);
-      setIsSelectionMode(false);
     } catch (error) {
       console.error("Error updating license plates:", error);
     } finally {
@@ -215,6 +218,11 @@ const StateList = ({ state, type }) => {
                 return (
                   <LicensePlateCard
                     plate={item}
+                    handleRefresh={() => {
+                      if (type === "profile") {
+                        fetchUserLicensePlates(true);
+                      }
+                    }}
                     isSelected={selectedPlates.includes(item.id)}
                     onSelect={handleSelectPlate}
                     isSelectionMode={isSelectionMode}
@@ -261,7 +269,7 @@ const StateList = ({ state, type }) => {
         </View>
         {isSelectionMode && (
           <LinearGradient
-            className={`absolute bottom-[${type === "home" ? 168 : 72}] left-0 right-0 p-2 mx-3 flex-row justify-between`}
+            className={`absolute ${type === "home" ? "bottom-[168px]" : "bottom-[72px]"} left-0 right-0 p-2 mx-3 flex-row justify-between`}
             colors={["#0B314200", "#0B3142"]}
           >
             <Button
@@ -295,7 +303,7 @@ const StateList = ({ state, type }) => {
           </Text>
           <FlatList
             data={selectedPlates}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => item.toString()}
             renderItem={({ item }) => {
               const plate = licensePlates.find((p) => p.id === item);
               return (

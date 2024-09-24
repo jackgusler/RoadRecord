@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  Image,
-} from "react-native";
+import { View, Text, TouchableOpacity, Alert, Image } from "react-native";
 import Button from "./Button";
 import { icons } from "../constants";
 import * as userLP from "../services/userLicensePlateService";
@@ -15,12 +8,13 @@ import CustomModal from "./CustomModal";
 
 const LicensePlateCard = ({
   plate,
+  handleRefresh,
   isSelected,
   onSelect,
   isSelectionMode,
   onLongPress,
 }) => {
-  const { userLicensePlates, fetchLicensePlates, isLoading } =
+  const { fetchLicensePlates, userLicensePlates, isLoading } =
     useGlobalContext();
 
   const [isSeen, setIsSeen] = useState();
@@ -42,25 +36,72 @@ const LicensePlateCard = ({
     try {
       if (toggleType === "favorite") {
         if (isToggled) {
-          await userLP.unfavoriteUserLicensePlate(plate.id);
-          setIsFavorite(false);
+          if (!isSeen) {
+            Alert.alert(
+              "Are you sure?",
+              "Unfavoriting this license plate will remove it from your selections. Do you want to continue?",
+              [
+                {
+                  text: "Cancel",
+                  onPress: () => {},
+                  style: "cancel",
+                },
+                {
+                  text: "Unfavorite",
+                  onPress: async () => {
+                    await userLP.unfavoriteUserLicensePlate(plate.id);
+                    setIsFavorite(false);
+                    handleRefresh();
+                    fetchLicensePlates();
+                  },
+                },
+              ]
+            );
+          } else {
+            await userLP.unfavoriteUserLicensePlate(plate.id);
+            setIsFavorite(false);
+          }
         } else {
           await userLP.favoriteUserLicensePlate(plate.id);
           setIsFavorite(true);
         }
       } else if (toggleType === "seen") {
         if (isToggled) {
-          await userLP.unseenUserLicensePlate(plate.id);
-          setIsSeen(false);
+          if (!isFavorite) {
+            Alert.alert(
+              "Are you sure?",
+              "Unseeing this license plate will remove it from your selections. Do you want to continue?",
+              [
+                {
+                  text: "Cancel",
+                  onPress: () => {},
+                  style: "cancel",
+                },
+                {
+                  text: "Unsee",
+                  onPress: async () => {
+                    await userLP.unseenUserLicensePlate(plate.id);
+                    setIsSeen(false);
+                    handleRefresh();
+                    fetchLicensePlates();
+                  },
+                },
+              ]
+            );
+          } else {
+            await userLP.unseenUserLicensePlate(plate.id);
+            setIsSeen(false);
+          }
         } else {
           await userLP.seenUserLicensePlate(plate.id);
           setIsSeen(true);
         }
       }
+
+      fetchLicensePlates();
     } catch (error) {
       Alert.alert("Error", `Failed to toggle ${toggleType} status.`);
     }
-    fetchLicensePlates();
   };
 
   const toggleModal = () => {
