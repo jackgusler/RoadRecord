@@ -2,11 +2,11 @@ import { StyleSheet, Text, View } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 import React from 'react';
 
-const CustomCheckBox = ({ title = '', value = false, handleToggle = () => {} }) => {
+const CustomCheckBox = ({ title = '', value = false, handleToggle = () => {}, containerStyles }) => {
   return (
-    <View>
+    <View className={`${containerStyles}`}>
       <CheckBox
-        title={<Text className="font-umedium">{title}</Text>}
+        title={<Text className="font-usemibold">{title}</Text>}
         checked={value}
         onPress={handleToggle}
         checkedColor="#92AD94"

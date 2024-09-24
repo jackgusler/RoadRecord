@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LicensePlateController;
 use App\Http\Controllers\UserLicensePlateController;
+use App\Http\Controllers\TripController;
 
 // Public routes
 Route::post('/auth/sign-in', [AuthController::class, 'signIn']);
@@ -36,4 +37,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/user/license-plates/{id}/seen', [UserLicensePlateController::class, 'seenUserLicensePlate']);
     Route::post('/user/license-plates/{id}/unseen', [UserLicensePlateController::class, 'unseenUserLicensePlate']);
     Route::post('/user/license-plates/batch-update', [UserLicensePlateController::class, 'batchUpdateUserLicensePlates']);
+
+    Route::get('/trips', [TripController::class, 'getTripsByUser']);
+    Route::post('/trips', [TripController::class, 'createTrip']);
+    Route::patch('/trips/{id}', [TripController::class, 'updateTrip']);
+    Route::delete('/trips/{id}', [TripController::class, 'deleteTrip']);
 });

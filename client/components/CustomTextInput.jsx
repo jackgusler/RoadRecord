@@ -24,7 +24,7 @@ const CustomTextInput = forwardRef(
       search,
       children,
       onFocus, // Add onFocus prop
-      onBlur,  // Add onBlur prop
+      onBlur, // Add onBlur prop
     },
     ref
   ) => {
@@ -43,7 +43,7 @@ const CustomTextInput = forwardRef(
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View className={containerStyles}>
-          {label && <Text className="text-lg font-semibold mb-2">{label}</Text>}
+          {label && <Text className="text-lg font-usemibold mb-2">{label}</Text>}
           <View
             className={`flex-row items-center border-2 rounded-2xl overflow-hidden border-secondary ${search ? "bg-primary" : ""}`}
           >
@@ -59,7 +59,7 @@ const CustomTextInput = forwardRef(
               blurOnSubmit={blurOnSubmit}
               ref={ref}
               onFocus={handleFocus} // Use handleFocus
-              onBlur={handleBlur}   // Use handleBlur
+              onBlur={handleBlur} // Use handleBlur
             />
 
             {search && children({ isFocused })}
