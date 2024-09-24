@@ -105,7 +105,7 @@ const StateList = ({ state, type }) => {
         setHasMore(false);
       }
 
-      if (data.length === 0) {
+      if (data.length === 0 && state.abbreviation !== "ALL") {
         router.back();
       }
     } catch (error) {
