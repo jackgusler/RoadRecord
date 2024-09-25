@@ -58,7 +58,7 @@ const SelectedLicensePlateCard = ({ plate, userSelections, setUserSelections, ha
           handlePress={() => handleToggle(plate.id, "seen")}
           color="secondary"
           containerStyle="w-22 h-14"
-          textSyle={"text-sm"}
+          textStyle={"text-sm"}
         />
         <Button
           title={isFavorite ? "Unfavorite" : "Favorite"}
@@ -66,7 +66,7 @@ const SelectedLicensePlateCard = ({ plate, userSelections, setUserSelections, ha
           handlePress={() => handleToggle(plate.id, "favorite")}
           color="secondary"
           containerStyle="w-22 h-14"
-          textSyle={"text-sm"}
+          textStyle={"text-sm"}
         />
       </View>
     </View>

@@ -21,13 +21,14 @@ class TripController extends Controller
     public function createTrip(Request $request)
     {
         $validatedData = $request->validate([
-            'start_location' => 'required|string|max:255',
-            'end_location' => 'required|string|max:255',
+            'starting_location' => 'required|string|max:255',
+            'ending_location' => 'required|string|max:255',
             'time' => 'required|date_format:H:i',
             'starting_date' => 'required|date',
             'ending_date' => 'required|date|after_or_equal:starting_date',
             'name' => 'required|string|max:255',
-            'still_driving' => 'required|boolean',
+            'started' => 'required|boolean',
+            'ended' => 'required|boolean',
         ]);
 
         $trip = new Trip($validatedData);
@@ -41,13 +42,14 @@ class TripController extends Controller
     public function updateTrip(Request $request, $id)
     {
         $validatedData = $request->validate([
-            'start_location' => 'required|string|max:255',
-            'end_location' => 'required|string|max:255',
+            'starting_location' => 'required|string|max:255',
+            'ending_location' => 'required|string|max:255',
             'time' => 'required|date_format:H:i',
             'starting_date' => 'required|date',
             'ending_date' => 'required|date|after_or_equal:starting_date',
             'name' => 'required|string|max:255',
-            'still_driving' => 'required|boolean',
+            'started' => 'required|boolean',
+            'ended' => 'required|boolean',
         ]);
 
         $trip = Trip::findOrFail($id);

@@ -1,25 +1,29 @@
 import { Text, View } from "react-native";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getTripsByUser, createTrip } from "../../services/tripService";
+import {
+  getTripsByUser,
+  createTrip,
+  deleteTrip,
+} from "../../services/tripService";
 import { useFocusEffect } from "expo-router";
 import Button from "../../components/Button";
 import CustomTextInput from "../../components/CustomTextInput";
 import CustomModal from "../../components/CustomModal";
-import CustomCheckBox from "../../components/CustomCheckBox";
+import TripCard from "../../components/TripCard";
 
 const Trips = () => {
   const [trips, setTrips] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [formData, setFormData] = useState({
-    start_location: "",
-    end_location: "",
-    time: "",
-    starting_date: "",
-    ending_date: "",
     name: "",
-    still_driving: false,
+    starting_location: "",
+    ending_location: "",
   });
+
+  const nameRef = useRef();
+  const startLocationRef = useRef();
+  const endLocationRef = useRef();
 
   useFocusEffect(
     useCallback(() => {
@@ -41,13 +45,42 @@ const Trips = () => {
   };
 
   const handleCreateTrip = async () => {
+    const placeholderTime = "00:00";
+    const currentDateTime = new Date().toISOString();
+    const placeholderDateTime = "9999-12-31T23:59:59Z";
+
+    const tripData = {
+      ...formData,
+      time: placeholderTime,
+      starting_date: currentDateTime,
+      ending_date: placeholderDateTime,
+      started: false,
+      ended: false,
+    };
+
     try {
-      await createTrip(formData);
+      await createTrip(tripData);
       setIsModalVisible(false);
       const data = await getTripsByUser();
       setTrips(data);
     } catch (error) {
       console.error("Error creating trip:", error);
+    }
+
+    setFormData({
+      name: "",
+      starting_location: "",
+      ending_location: "",
+    });
+  };
+
+  const handleDeleteTrip = async (id) => {
+    try {
+      await deleteTrip(id);
+      const data = await getTripsByUser();
+      setTrips(data);
+    } catch (error) {
+      console.error("Error deleting trip:", error);
     }
   };
 
@@ -55,14 +88,16 @@ const Trips = () => {
     <SafeAreaView className="bg-primary h-full">
       <View className="flex items-center justify-center h-full">
         {trips.map((trip) => (
-          <View key={trip.id}>
-            <Text>{trip.name}</Text>
+          <View className="w-full mb-4" key={trip.id}>
+            <TripCard trip={trip} onDelete={() => handleDeleteTrip(trip.id)} />
           </View>
         ))}
         <Button
           title="Create New Trip"
           handlePress={() => setIsModalVisible(true)}
           color="secondary"
+          containerStyle="w-1/2 mt-4"
+          textStyle={"text-lg"}
         />
       </View>
 
@@ -77,48 +112,62 @@ const Trips = () => {
             handleChangeText={(value) => handleInputChange("name", value)}
             value={formData.name}
             containerStyles="mb-4 w-full"
-            inputStyles="bg-accent h-8"
+            inputStyles="bg-accent h-8 text-primary"
+            labelColor="primary"
             textColor="#0B3142"
+            returnKeyType="next"
+            onSubmitEditing={() => startLocationRef.current.focus()}
+            blurOnSubmit={false}
+            ref={nameRef}
           />
           <View className="flex-row justify-center gap-4">
-            <View className="flex-1">
+            <View className="flex-1 pr-2">
               <CustomTextInput
                 label="Start Location"
                 placeholder="Enter start location"
                 handleChangeText={(value) =>
-                  handleInputChange("start_location", value)
+                  handleInputChange("starting_location", value)
                 }
-                value={formData.start_location}
-                inputStyles="bg-accent h-8"
+                value={formData.starting_location}
+                inputStyles="bg-accent h-8 text-primary"
+                labelColor="primary"
                 textColor="#0B3142"
+                returnKeyType="next"
+                onSubmitEditing={() => endLocationRef.current.focus()}
+                blurOnSubmit={false}
+                ref={startLocationRef}
               />
             </View>
-            <View className="flex-1">
+            <View className="flex-1 pl-2">
               <CustomTextInput
                 label="End Location"
                 placeholder="Enter end location"
                 handleChangeText={(value) =>
-                  handleInputChange("end_location", value)
+                  handleInputChange("ending_location", value)
                 }
-                value={formData.end_location}
-                inputStyles="bg-accent h-8"
+                value={formData.ending_location}
+                inputStyles="bg-accent h-8 text-primary"
+                labelColor="primary"
                 textColor="#0B3142"
                 containerStyles="mb-4"
+                returnKeyType="done"
+                onSubmitEditing={handleCreateTrip}
+                blurOnSubmit={false}
+                ref={endLocationRef}
               />
             </View>
           </View>
-          <CustomCheckBox
-            title="Still Driving"
-            value={formData.still_driving}
-            handleToggle={() =>
-              handleInputChange("still_driving", !formData.still_driving)
-            }
-            containerStyles="mb-4"
-          />
           <Button
             title="Create Trip"
             handlePress={handleCreateTrip}
             color="secondary"
+            containerStyle="w-full"
+            textStyle={"text-lg"}
+            disabled={
+              !formData.name ||
+              !formData.starting_location ||
+              !formData.ending_location
+            }
           />
         </View>
       </CustomModal>

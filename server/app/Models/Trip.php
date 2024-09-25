@@ -23,13 +23,14 @@ class Trip extends Model
      */
     protected $fillable = [
         'user_id',
-        'start_location',
-        'end_location',
+        'starting_location',
+        'ending_location',
         'time',
         'starting_date',
         'ending_date',
         'name',
-        'still_driving',
+        'started',
+        'ended',
     ];
 
     /**

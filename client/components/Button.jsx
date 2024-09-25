@@ -7,7 +7,7 @@ const Button = ({
   handlePress,
   color,
   containerStyle,
-  textSyle,
+  textStyle,
   disabled,
 }) => {
   return (
@@ -16,9 +16,10 @@ const Button = ({
       onPress={handlePress}
       activeOpacity={0.7}
       disabled={disabled}
+      style={{ opacity: disabled ? 0.5 : 1 }} // Adjust opacity based on disabled prop
     >
       <View className="flex-row items-center justify-center">
-        <Text className={`text-accent font-usemibold ${textSyle}`}>
+        <Text className={`text-accent font-usemibold ${textStyle}`}>
           {title}
         </Text>
         {icon ? (

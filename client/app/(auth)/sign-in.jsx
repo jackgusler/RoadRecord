@@ -84,7 +84,7 @@ const SignIn = () => {
             title="Sign in"
             handlePress={handleSignIn}
             color="primary"
-            textSyle={"text-lg"}
+            textStyle={"text-lg"}
           />
         </View>
       </View>

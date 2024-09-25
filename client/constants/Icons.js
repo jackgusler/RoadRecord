@@ -2,6 +2,7 @@ import arrowLeft from "../assets/icons/arrow-fat-left-duotone.png";
 import arrowLeftFill from "../assets/icons/arrow-fat-left-fill.png";
 import arrowRight from "../assets/icons/arrow-fat-right-duotone.png";
 import arrowRightFill from "../assets/icons/arrow-fat-right-fill.png";
+import arrowRightRegular from "../assets/icons/arrow-right-regular.png";
 import arrowsReverse from "../assets/icons/arrows-counter-clockwise-duotone.png";
 import bell from "../assets/icons/bell-simple-duotone.png";
 import bellFill from "../assets/icons/bell-simple-fill.png";
@@ -49,6 +50,7 @@ export default {
   arrowLeftFill,
   arrowRight,
   arrowRightFill,
+  arrowRightRegular,
   arrowsReverse,
   bell,
   bellFill,

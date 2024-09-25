@@ -185,7 +185,7 @@ const SignUp = () => {
             title="Sign up"
             handlePress={handleSignUp}
             color="primary"
-            textSyle={"text-lg"}
+            textStyle={"text-lg"}
           />
         </View>
       </View>

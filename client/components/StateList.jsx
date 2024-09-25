@@ -277,21 +277,21 @@ const StateList = ({ state, type }) => {
               handlePress={handleSelectAll}
               color="secondary"
               containerStyle="flex-1 mb-3"
-              textSyle={"text-lg"}
+              textStyle={"text-lg"}
             />
             <Button
               title="Deselect All"
               handlePress={handleDeselectAll}
               color="secondary"
               containerStyle="flex-1 mb-3 mx-[3]"
-              textSyle={"text-lg"}
+              textStyle={"text-lg"}
             />
             <Button
               title="Confirm"
               handlePress={() => toggleModal()}
               color="secondary"
               containerStyle="flex-1 mb-3"
-              textSyle={"text-lg"}
+              textStyle={"text-lg"}
             />
           </LinearGradient>
         )}
@@ -323,14 +323,14 @@ const StateList = ({ state, type }) => {
               handlePress={() => handleConfirm()}
               color="secondary"
               containerStyle="mt-2 flex-1 mr-2"
-              textSyle={"text-lg"}
+              textStyle={"text-lg"}
             />
             <Button
               title={"Close"}
               handlePress={() => toggleModal()}
               color="secondary"
               containerStyle="mt-2 flex-1 ml-2"
-              textSyle={"text-lg"}
+              textStyle={"text-lg"}
             />
           </View>
         </View>

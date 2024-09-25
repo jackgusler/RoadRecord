@@ -7,6 +7,7 @@ import { useRouter } from "expo-router";
 import { icons } from "../constants";
 import SearchInput from "../components/SearchInput";
 import { View, TouchableOpacity, Image } from "react-native";
+import { GestureHandlerRootView } from 'react-native-gesture-handler'; // Import GestureHandlerRootView
 
 SplashScreen.preventAutoHideAsync();
 
@@ -48,15 +49,17 @@ const RootLayout = () => {
   const showHeader = segments.includes("(tabs)") || segments.includes("search");
 
   return (
-    <AuthProvider>
-      {showHeader && <Header />}
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="search/[query]" options={{ headerShown: false }} />
-      </Stack>
-    </AuthProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AuthProvider>
+        {showHeader && <Header />}
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="search/[query]" options={{ headerShown: false }} />
+        </Stack>
+      </AuthProvider>
+    </GestureHandlerRootView>
   );
 };
 

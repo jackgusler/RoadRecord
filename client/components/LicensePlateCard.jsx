@@ -173,7 +173,7 @@ const LicensePlateCard = ({
             handlePress={() => handleToggle(isSeen, "seen")}
             color="secondary"
             containerStyle="mt-2 flex-1 mr-2"
-            textSyle={"text-lg"}
+            textStyle={"text-lg"}
             disabled={isLoading}
           />
           <Button
@@ -182,7 +182,7 @@ const LicensePlateCard = ({
             handlePress={() => handleToggle(isFavorite, "favorite")}
             color="secondary"
             containerStyle="mt-2 flex-1 ml-2"
-            textSyle={"text-lg"}
+            textStyle={"text-lg"}
             disabled={false}
           />
         </View>

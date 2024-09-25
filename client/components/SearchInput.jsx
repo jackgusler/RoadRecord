@@ -193,7 +193,7 @@ const SearchInput = ({ initialQuery }) => {
                     handlePress={toggleModal}
                     color="secondary"
                     containerStyle="mt-2 flex-1 mr-2"
-                    textSyle={"text-lg"}
+                    textStyle={"text-lg"}
                     disabled={false}
                   />
                   <Button
@@ -201,7 +201,7 @@ const SearchInput = ({ initialQuery }) => {
                     handlePress={toggleModal}
                     color="secondary"
                     containerStyle="mt-2 flex-1 ml-2"
-                    textSyle={"text-lg"}
+                    textStyle={"text-lg"}
                     disabled={false}
                   />
                 </View>
