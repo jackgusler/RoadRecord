@@ -13,6 +13,19 @@ export const getTripsByUser = async () => {
   }
 };
 
+export const getTripById = async (id) => {
+  try {
+    const response = await api.get(`/trips/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Error fetching trip with id ${id}:`,
+      error.response ? error.response.data : error.message
+    );
+    throw error;
+  }
+}
+
 export const createTrip = async (trip) => {
   try {
     const response = await api.post("/trips", trip);
@@ -35,6 +48,26 @@ export const updateTrip = async (trip) => {
       `Error updating trip with id ${trip.id}:`,
       error.response ? error.response.data : error.message
     );
+    throw error;
+  }
+};
+
+export const startTrip = async (id) => {
+  try {
+    const response = await api.patch(`/trips/${id}/start`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error starting trip with id ${id}:`, error);
+    throw error;
+  }
+};
+
+export const endTrip = async (id) => {
+  try {
+    const response = await api.patch(`/trips/${id}/end`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error ending trip with id ${id}:`, error);
     throw error;
   }
 };

@@ -39,7 +39,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/user/license-plates/batch-update', [UserLicensePlateController::class, 'batchUpdateUserLicensePlates']);
 
     Route::get('/trips', [TripController::class, 'getTripsByUser']);
+    Route::get('/trips/{id}', [TripController::class, 'getTripById']);
     Route::post('/trips', [TripController::class, 'createTrip']);
     Route::patch('/trips/{id}', [TripController::class, 'updateTrip']);
+    Route::patch('/trips/{id}/start', [TripController::class, 'startTrip']);
+    Route::patch('/trips/{id}/end', [TripController::class, 'endTrip']);
     Route::delete('/trips/{id}', [TripController::class, 'deleteTrip']);
 });

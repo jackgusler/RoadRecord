@@ -10,6 +10,7 @@ module.exports = {
         muted: "#748B75", // Muted Olive
         mutedLight: "#859986", // Soft Green
         dark: "#503D42", // Deep Brown
+        deep: "#092734" // Deep Blue
 
         // primary: "#839788",
         // secondary: "#eee0cb",

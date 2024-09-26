@@ -1,19 +1,29 @@
-import { Text, View } from "react-native";
-import React, { useCallback, useRef, useState } from "react";
+import { Alert, Text, View } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   getTripsByUser,
   createTrip,
   deleteTrip,
+  startTrip,
+  endTrip,
 } from "../../services/tripService";
 import { useFocusEffect } from "expo-router";
 import Button from "../../components/Button";
 import CustomTextInput from "../../components/CustomTextInput";
 import CustomModal from "../../components/CustomModal";
 import TripCard from "../../components/TripCard";
+import TripCardList from "../../components/TripCardList";
+import { useGlobalContext } from "../../context/AuthContext";
+import { Flow } from "react-native-animated-spinkit";
 
 const Trips = () => {
+  const { isLoading, setIsLoading } = useGlobalContext();
+
   const [trips, setTrips] = useState([]);
+  const [currentTrip, setCurrentTrip] = useState(null);
+  const [pastTrips, setPastTrips] = useState([]);
+  const [futureTrips, setFutureTrips] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -27,32 +37,44 @@ const Trips = () => {
 
   useFocusEffect(
     useCallback(() => {
-      const fetchTrips = async () => {
-        try {
-          const data = await getTripsByUser();
-          setTrips(data);
-        } catch (error) {
-          console.error("Error fetching trips:", error);
-        }
-      };
-
       fetchTrips();
     }, [])
   );
+
+  const fetchTrips = async () => {
+    setIsLoading(true);
+    try {
+      const data = await getTripsByUser();
+      setTrips(data);
+    } catch (error) {
+      console.error("Error fetching trips:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const currentTrip = trips.find((trip) => trip.started && !trip.ended);
+    const pastTrips = trips.filter((trip) => trip.ended);
+    const futureTrips = trips.filter((trip) => !trip.started && !trip.ended);
+
+    setCurrentTrip(currentTrip);
+    setPastTrips(pastTrips);
+    setFutureTrips(futureTrips);
+  }, [trips]);
 
   const handleInputChange = (name, value) => {
     setFormData({ ...formData, [name]: value });
   };
 
   const handleCreateTrip = async () => {
-    const placeholderTime = "00:00";
-    const currentDateTime = new Date().toISOString();
-    const placeholderDateTime = "9999-12-31T23:59:59Z";
+    const placeholderTime = "00:00:00";
+    const placeholderDateTime = "1970-01-01T00:00:00Z";
 
     const tripData = {
       ...formData,
       time: placeholderTime,
-      starting_date: currentDateTime,
+      starting_date: placeholderDateTime,
       ending_date: placeholderDateTime,
       started: false,
       ended: false,
@@ -74,32 +96,130 @@ const Trips = () => {
     });
   };
 
+  const handleStartTrip = async (id) => {
+    const startNewTrip = async (tripId) => {
+      try {
+        await startTrip(tripId);
+        await fetchTrips();
+      } catch (error) {
+        console.error("Error starting trip:", error);
+      }
+    };
+
+    if (currentTrip) {
+      Alert.alert("Are you sure?", "This will end your current trip.", [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "OK",
+          onPress: async () => {
+            try {
+              await endTrip(currentTrip.id);
+              await startNewTrip(id);
+            } catch (error) {
+              console.error("Error ending current trip:", error);
+            }
+          },
+        },
+      ]);
+    } else {
+      await startNewTrip(id);
+    }
+  };
+
+  const handleEndTrip = async (id) => {
+    try {
+      await endTrip(id);
+      fetchTrips();
+    } catch (error) {
+      console.error("Error ending trip:", error);
+    }
+  };
+
   const handleDeleteTrip = async (id) => {
     try {
       await deleteTrip(id);
-      const data = await getTripsByUser();
-      setTrips(data);
+      setTrips((prevTrips) => prevTrips.filter((trip) => trip.id !== id));
     } catch (error) {
       console.error("Error deleting trip:", error);
     }
   };
 
   return (
-    <SafeAreaView className="bg-primary h-full">
-      <View className="flex items-center justify-center h-full">
-        {trips.map((trip) => (
-          <View className="w-full mb-4" key={trip.id}>
-            <TripCard trip={trip} onDelete={() => handleDeleteTrip(trip.id)} />
+    <>
+      <SafeAreaView className="bg-primary h-full mt-20">
+        <View className="flex justify-center w-full h-36 p-4 mb-2">
+          <Text className="text-3xl text-accent font-ubold ml-2 mb-2">Current Trip</Text>
+          <View className="w-full h-full bg-deep rounded-lg py-4 flex items-center justify-center">
+            {isLoading ? (
+              <Flow size={50} color="#92AD94" />
+            ) : currentTrip ? (
+              <TripCard
+                trip={currentTrip}
+                onDelete={handleDeleteTrip}
+                onStart={handleStartTrip}
+                onEnd={handleEndTrip}
+              />
+            ) : (
+              <Text className="text-primary text-3xl font-uregular text-center">
+                No current trip
+              </Text>
+            )}
           </View>
-        ))}
-        <Button
-          title="Create New Trip"
-          handlePress={() => setIsModalVisible(true)}
-          color="secondary"
-          containerStyle="w-1/2 mt-4"
-          textStyle={"text-lg"}
-        />
-      </View>
+        </View>
+
+        <View className="flex justify-center w-full h-[28%] p-4 mb-2">
+          <Text className="text-3xl text-accent font-ubold ml-2 my-2">Future Trips</Text>
+          <View className="w-full h-full bg-deep rounded-lg flex items-center justify-center">
+            {isLoading ? (
+              <Flow size={50} color="#92AD94" />
+            ) : futureTrips.length === 0 ? (
+              <Text className="text-primary text-3xl font-uregular text-center">
+                No future trips
+              </Text>
+            ) : (
+              <TripCardList
+                trips={futureTrips}
+                onDelete={handleDeleteTrip}
+                onStart={handleStartTrip}
+                onEnd={handleEndTrip}
+              />
+            )}
+          </View>
+        </View>
+
+        <View className="flex justify-center w-full h-[28%] p-4">
+          <Text className="text-3xl text-accent font-ubold ml-2 my-2">Past Trips</Text>
+          <View className="w-full h-full bg-deep rounded-lg flex items-center justify-center">
+            {isLoading ? (
+              <Flow size={50} color="#92AD94" />
+            ) : pastTrips.length === 0 ? (
+              <Text className="text-primary text-3xl font-uregular text-center">
+                No past trips
+              </Text>
+            ) : (
+              <TripCardList
+                trips={pastTrips}
+                onDelete={handleDeleteTrip}
+                onStart={handleStartTrip}
+                onEnd={handleEndTrip}
+              />
+            )}
+          </View>
+        </View>
+
+        <View className="w-full flex-row justify-center">
+          <Button
+            title="Create New Trip"
+            handlePress={() => setIsModalVisible(true)}
+            color="secondary"
+            containerStyle="w-1/2 h-12 mt-4"
+            textStyle={"text-lg"}
+          />
+        </View>
+      </SafeAreaView>
 
       <CustomModal
         isVisible={isModalVisible}
@@ -171,7 +291,7 @@ const Trips = () => {
           />
         </View>
       </CustomModal>
-    </SafeAreaView>
+    </>
   );
 };
 
