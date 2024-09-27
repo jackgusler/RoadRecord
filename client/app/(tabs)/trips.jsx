@@ -151,8 +151,10 @@ const Trips = () => {
     <>
       <SafeAreaView className="bg-primary h-full mt-20">
         <View className="flex justify-center w-full h-36 p-4 mb-2">
-          <Text className="text-3xl text-accent font-ubold ml-2 mb-2">Current Trip</Text>
-          <View className="w-full h-full bg-deep rounded-lg py-4 flex items-center justify-center">
+          <Text className="text-3xl text-accent font-ubold ml-2 mb-2">
+            Current Trip
+          </Text>
+          <View className="w-full h-full bg-primaryDark rounded-lg py-4 flex items-center justify-center">
             {isLoading ? (
               <Flow size={50} color="#92AD94" />
             ) : currentTrip ? (
@@ -161,6 +163,7 @@ const Trips = () => {
                 onDelete={handleDeleteTrip}
                 onStart={handleStartTrip}
                 onEnd={handleEndTrip}
+                onSave={fetchTrips}
               />
             ) : (
               <Text className="text-primary text-3xl font-uregular text-center">
@@ -171,8 +174,10 @@ const Trips = () => {
         </View>
 
         <View className="flex justify-center w-full h-[28%] p-4 mb-2">
-          <Text className="text-3xl text-accent font-ubold ml-2 my-2">Future Trips</Text>
-          <View className="w-full h-full bg-deep rounded-lg flex items-center justify-center">
+          <Text className="text-3xl text-accent font-ubold ml-2 my-2">
+            Future Trips
+          </Text>
+          <View className="w-full h-full bg-primaryDark rounded-lg flex items-center justify-center">
             {isLoading ? (
               <Flow size={50} color="#92AD94" />
             ) : futureTrips.length === 0 ? (
@@ -185,14 +190,17 @@ const Trips = () => {
                 onDelete={handleDeleteTrip}
                 onStart={handleStartTrip}
                 onEnd={handleEndTrip}
+                onSave={fetchTrips}
               />
             )}
           </View>
         </View>
 
         <View className="flex justify-center w-full h-[28%] p-4">
-          <Text className="text-3xl text-accent font-ubold ml-2 my-2">Past Trips</Text>
-          <View className="w-full h-full bg-deep rounded-lg flex items-center justify-center">
+          <Text className="text-3xl text-accent font-ubold ml-2 my-2">
+            Past Trips
+          </Text>
+          <View className="w-full h-full bg-primaryDark rounded-lg flex items-center justify-center">
             {isLoading ? (
               <Flow size={50} color="#92AD94" />
             ) : pastTrips.length === 0 ? (
@@ -205,6 +213,7 @@ const Trips = () => {
                 onDelete={handleDeleteTrip}
                 onStart={handleStartTrip}
                 onEnd={handleEndTrip}
+                onSave={fetchTrips}
               />
             )}
           </View>
@@ -215,7 +224,7 @@ const Trips = () => {
             title="Create New Trip"
             handlePress={() => setIsModalVisible(true)}
             color="secondary"
-            containerStyle="w-1/2 h-12 mt-4"
+            containerStyle="w-1/2 h-12 mt-5"
             textStyle={"text-lg"}
           />
         </View>

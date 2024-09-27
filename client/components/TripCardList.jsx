@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, FlatList } from "react-native";
 import React from "react";
 import TripCard from "./TripCard";
 
-const TripCardList = ({ trips, onDelete, onStart, onEnd }) => {
+const TripCardList = ({ trips, onDelete, onStart, onEnd, onSave }) => {
   return (
     <FlatList
       data={trips}
@@ -12,6 +12,7 @@ const TripCardList = ({ trips, onDelete, onStart, onEnd }) => {
           onDelete={() => onDelete(item.id)}
           onStart={() => onStart(item.id)}
           onEnd={() => onEnd(item.id)}
+          onSave={onSave}
         />
       )}
       keyExtractor={(trip) => trip.id.toString()}

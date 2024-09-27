@@ -8,7 +8,7 @@ import {
   Animated,
 } from "react-native";
 
-const CustomModal = ({ isVisible, onClose, children }) => {
+const CustomModal = ({ isVisible, onClose, containerStyles, children }) => {
   const [modalVisible, setModalVisible] = useState(isVisible);
   const opacity = useRef(new Animated.Value(0)).current;
 
@@ -34,7 +34,11 @@ const CustomModal = ({ isVisible, onClose, children }) => {
       <TouchableWithoutFeedback onPress={onClose}>
         <Animated.View style={[styles.modalBackground, { opacity }]}>
           <TouchableWithoutFeedback>
-            <View className="w-[350] bg-accent rounded-lg p-4">{children}</View>
+            <View
+              className={`w-[350] bg-accent rounded-lg p-4 ${containerStyles}`}
+            >
+              {children}
+            </View>
           </TouchableWithoutFeedback>
         </Animated.View>
       </TouchableWithoutFeedback>

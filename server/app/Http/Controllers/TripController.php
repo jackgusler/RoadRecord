@@ -66,14 +66,9 @@ class TripController extends Controller
     public function updateTrip(Request $request, $id)
     {
         $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
             'starting_location' => 'required|string|max:255',
             'ending_location' => 'required|string|max:255',
-            'time' => 'required|date_format:H:i',
-            'starting_date' => 'required|date',
-            'ending_date' => 'required|date|after_or_equal:starting_date',
-            'name' => 'required|string|max:255',
-            'started' => 'required|boolean',
-            'ended' => 'required|boolean',
         ]);
 
         $trip = Trip::findOrFail($id);
@@ -81,7 +76,6 @@ class TripController extends Controller
 
         return response()->json(['message' => 'Trip updated successfully', 'trip' => $trip]);
     }
-
 
     // Start a trip
     public function startTrip($id)
