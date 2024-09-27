@@ -373,7 +373,6 @@ const TripCard = ({ trip, onDelete, onStart, onEnd, onSave }) => {
             <View className="flex-1 bg-secondary p-2 rounded-lg">
               {/* Content for the second view goes here */}
             </View>
-            
           </View>
           <View className="flex flex-row">
             {!isEditing ? (

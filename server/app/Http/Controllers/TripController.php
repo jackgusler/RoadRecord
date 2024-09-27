@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Trip;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class TripController extends Controller
 {
@@ -37,6 +38,18 @@ class TripController extends Controller
             $trip->time = $duration->format('%h:%i:%s');
             $trip->save();
         }
+
+        return response()->json($trip);
+    }
+
+    // Get current trip
+    public function getCurrentTrip()
+    {
+        $user = Auth::user();
+        $trip = Trip::where('user_id', $user->id)
+            ->where('started', true)
+            ->where('ended', false)
+            ->first();
 
         return response()->json($trip);
     }

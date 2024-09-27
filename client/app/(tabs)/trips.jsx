@@ -18,10 +18,10 @@ import { useGlobalContext } from "../../context/AuthContext";
 import { Flow } from "react-native-animated-spinkit";
 
 const Trips = () => {
-  const { isLoading, setIsLoading } = useGlobalContext();
+  const { currentTrip, setCurrentTrip, isLoading, setIsLoading } =
+    useGlobalContext();
 
   const [trips, setTrips] = useState([]);
-  const [currentTrip, setCurrentTrip] = useState(null);
   const [pastTrips, setPastTrips] = useState([]);
   const [futureTrips, setFutureTrips] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);

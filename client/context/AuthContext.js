@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { getCurrentUser } from "../services/userService";
 import { getLicensePlatesByUser } from "../services/userLicensePlateService";
+import { getCurrentTrip } from "../services/tripService";
 
 const AuthContext = createContext();
 export const useGlobalContext = () => useContext(AuthContext);
@@ -10,6 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [userLicensePlates, setUserLicensePlates] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentTrip, setCurrentTrip] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -33,7 +35,9 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    if (!user) return;
     fetchLicensePlates();
+    fetchCurrentTrip();
   }, [user]);
 
   const fetchLicensePlates = async () => {
@@ -48,6 +52,15 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const fetchCurrentTrip = async () => {
+    try {
+      const currentTrip = await getCurrentTrip();
+      setCurrentTrip(currentTrip);
+    } catch (error) {
+      console.error("Error fetching current trip:", error);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -57,9 +70,11 @@ export const AuthProvider = ({ children }) => {
         setUser,
         userLicensePlates,
         setUserLicensePlates,
+        fetchLicensePlates,
+        currentTrip,
+        setCurrentTrip,
         isLoading,
         setIsLoading,
-        fetchLicensePlates,
       }}
     >
       {children}

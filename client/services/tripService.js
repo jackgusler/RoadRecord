@@ -24,7 +24,17 @@ export const getTripById = async (id) => {
     );
     throw error;
   }
-}
+};
+
+export const getCurrentTrip = async () => {
+  try {
+    const response = await api.get("/trips/current");
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching current trip:`, error);
+    throw error;
+  }
+};
 
 export const createTrip = async (trip) => {
   try {
