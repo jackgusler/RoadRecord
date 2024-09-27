@@ -3,8 +3,10 @@ import { View, Text, TouchableOpacity, Alert, Image } from "react-native";
 import Button from "./Button";
 import { icons } from "../constants";
 import * as userLP from "../services/userLicensePlateService";
+import { createTripLicensePlate } from "../services/tripLicensePlateService";
 import { useGlobalContext } from "../context/AuthContext";
 import CustomModal from "./CustomModal";
+import * as Location from "expo-location";
 
 const LicensePlateCard = ({
   plate,
@@ -14,7 +16,7 @@ const LicensePlateCard = ({
   isSelectionMode,
   onLongPress,
 }) => {
-  const { fetchLicensePlates, userLicensePlates, isLoading } =
+  const { fetchLicensePlates, userLicensePlates, currentTrip, isLoading } =
     useGlobalContext();
 
   const [isSeen, setIsSeen] = useState();
@@ -93,7 +95,44 @@ const LicensePlateCard = ({
             setIsSeen(false);
           }
         } else {
-          await userLP.seenUserLicensePlate(plate.id);
+          try {
+            await userLP.seenUserLicensePlate(plate.id);
+          } catch (error) {
+            console.error("Error toggling seen status:", error);
+          }
+
+          if (currentTrip) {
+            try {
+              // Request location permissions
+              let { status } =
+                await Location.requestForegroundPermissionsAsync();
+              if (status !== "granted") {
+                console.error("Permission to access location was denied");
+                return;
+              }
+
+              // Get the current location
+              let location = await Location.getCurrentPositionAsync({});
+              const { latitude, longitude } = location.coords;
+
+              // Reverse geocoding to get town and state using Nominatim API
+              const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+              );
+              const data = await response.json();
+              const town =
+                data.address.city || data.address.town || data.address.village;
+              const state = data.address.state;
+
+              // Use the location and address in your API call
+              await createTripLicensePlate(currentTrip.id, {
+                license_plate_id: plate.id,
+                location_during_recording: `Town: ${town}, State: ${state}`,
+              });
+            } catch (error) {
+              console.error("Error adding license plate to trip:", error);
+            }
+          }
           setIsSeen(true);
         }
       }

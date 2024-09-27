@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\LicensePlateController;
 use App\Http\Controllers\UserLicensePlateController;
 use App\Http\Controllers\TripController;
+use App\Http\Controllers\TripLicensePlateController;
 
 // Public routes
 Route::post('/auth/sign-in', [AuthController::class, 'signIn']);
@@ -46,4 +47,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::patch('/trips/{id}/start', [TripController::class, 'startTrip']);
     Route::patch('/trips/{id}/end', [TripController::class, 'endTrip']);
     Route::delete('/trips/{id}', [TripController::class, 'deleteTrip']);
+
+    Route::get('/trips/{tripId}/license-plates', [TripLicensePlateController::class, 'getTripLicensePlatesByTrip']);
+    Route::get('/trips/{tripId}/license-plates/details', [TripLicensePlateController::class, 'getTripLicensePlateDetailsByTrip']);
+    Route::get('/trips/{tripId}/license-plates/{id}', [TripLicensePlateController::class, 'getTripLicensePlateById']);
+    Route::post('/trips/{tripId}/license-plates', [TripLicensePlateController::class, 'createTripLicensePlate']);
+    Route::delete('/trips/license-plates/{id}', [TripLicensePlateController::class, 'deleteTripLicensePlateById']);
 });

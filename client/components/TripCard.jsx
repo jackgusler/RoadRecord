@@ -1,4 +1,11 @@
-import { Image, Text, View } from "react-native";
+import {
+  FlatList,
+  Image,
+  Keyboard,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import { icons } from "../constants";
 import { Swipeable } from "react-native-gesture-handler";
 import Button from "./Button";
@@ -8,6 +15,7 @@ import { useRef, useState } from "react";
 import { getTripById, updateTrip } from "../services/tripService";
 import { Flow } from "react-native-animated-spinkit";
 import CustomTextInput from "./CustomTextInput";
+import { getTripLicensePlateDetailsByTrip } from "../services/tripLicensePlateService";
 
 const TripCard = ({ trip, onDelete, onStart, onEnd, onSave }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -25,10 +33,13 @@ const TripCard = ({ trip, onDelete, onStart, onEnd, onSave }) => {
 
   const [didEdit, setDidEdit] = useState(false);
 
+  const [tripLicensePlates, setTripLicensePlates] = useState([]);
+
   const openModal = async () => {
     setIsModalVisible(true);
     setIsLoading(true);
     setIsEditing(false);
+
     if (trip.started && !trip.ended) {
       try {
         const fetchedTrip = await getTripById(trip.id);
@@ -36,14 +47,20 @@ const TripCard = ({ trip, onDelete, onStart, onEnd, onSave }) => {
         setCurrentTripTime(formatTime(fetchedTrip.time));
       } catch (error) {
         console.error("Error fetching trip:", error);
-      } finally {
-        setIsLoading(false);
       }
     } else {
       setCurrentTrip(trip);
       setCurrentTripTime(formatTime(trip.time));
-      setIsLoading(false);
     }
+
+    try {
+      const licensePlates = await getTripLicensePlateDetailsByTrip(trip.id);
+      setTripLicensePlates(licensePlates);
+    } catch (error) {
+      console.error("Error fetching trip license plates:", error);
+    }
+
+    setIsLoading(false);
   };
 
   const closeModal = () => {
@@ -225,194 +242,236 @@ const TripCard = ({ trip, onDelete, onStart, onEnd, onSave }) => {
         onClose={closeModal}
         containerStyles="p-2"
       >
-        <View className="h-96 flex flex-col justify-between ">
-          <View className="flex flex-col items-center mb-1 h-10">
-            {!isEditing ? (
-              currentTrip ? (
-                <Text
-                  className="text-5xl font-ubold text-secondary"
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {currentTrip.name}
-                </Text>
-              ) : null
-            ) : (
-              <CustomTextInput
-                value={editTitle}
-                handleChangeText={setEditTitle}
-                containerStyles="w-full"
-                inputStyles="bg-accentDark h-[34px] text-secondary text-3xl pl-3"
-                textColor="#92AD94"
-                returnKeyType="next"
-                onSubmitEditing={() => editStartLocationRef.current.focus()}
-                blurOnSubmit={false}
-                ref={editTitleRef}
-              />
-            )}
-          </View>
-          <View className="flex flex-row flex-1 ">
-            <View className="flex-1 flex flex-col bg-accentDark p-2 rounded-lg justify-between mr-2">
-              {isLoading ? (
-                <View className="flex-1 flex items-center justify-center">
-                  <Flow size={50} color="#92AD94" />
-                </View>
-              ) : (
-                currentTrip && (
-                  <View className="flex flex-col space-y-2">
-                    <View>
-                      <Text className="text-lg font-ubold text-secondary underline">
-                        Starting Location:
-                      </Text>
-
-                      <View className="h-6">
-                        {!isEditing ? (
-                          <Text
-                            className="text-lg font-usemibold text-secondary"
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                          >
-                            {currentTrip.starting_location}
-                          </Text>
-                        ) : (
-                          <CustomTextInput
-                            value={editStartLocation}
-                            handleChangeText={setEditStartLocation}
-                            containerStyles="w-full"
-                            inputStyles="bg-accentDark h-[18px] text-secondary pl-2"
-                            textColor="#92AD94"
-                            returnKeyType="next"
-                            onSubmitEditing={() =>
-                              editEndLocationRef.current.focus()
-                            }
-                            blurOnSubmit={false}
-                            ref={editStartLocationRef}
-                          />
-                        )}
-                      </View>
-                    </View>
-
-                    <View>
-                      <Text className="text-lg font-ubold text-secondary underline">
-                        Ending Location:
-                      </Text>
-
-                      <View className="h-6">
-                        {!isEditing ? (
-                          <Text
-                            className="text-lg font-usemibold text-secondary"
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                          >
-                            {currentTrip.ending_location}
-                          </Text>
-                        ) : (
-                          <CustomTextInput
-                            value={editEndLocation}
-                            handleChangeText={setEditEndLocation}
-                            containerStyles="w-full"
-                            inputStyles="bg-accentDark h-[18px] text-secondary pl-2"
-                            textColor="#92AD94"
-                            returnKeyType="done"
-                            onSubmitEditing={saveChanges}
-                            ref={editEndLocationRef}
-                          />
-                        )}
-                      </View>
-                    </View>
-
-                    {currentTrip.started || currentTrip.ended ? (
-                      <View>
-                        <Text className="text-lg font-ubold text-secondary underline">
-                          Starting Time:
-                        </Text>
-                        <Text
-                          className="text-lg font-usemibold text-secondary"
-                          numberOfLines={1}
-                          ellipsizeMode="tail"
-                        >
-                          {new Date(currentTrip.starting_date).toLocaleString()}
-                        </Text>
-                      </View>
-                    ) : null}
-
-                    {currentTrip.ended ? (
-                      <View>
-                        <Text className="text-lg font-ubold text-secondary underline">
-                          Ending Time:
-                        </Text>
-                        <Text
-                          className="text-lg font-usemibold text-secondary"
-                          numberOfLines={1}
-                          ellipsizeMode="tail"
-                        >
-                          {new Date(currentTrip.ending_date).toLocaleString()}
-                        </Text>
-                      </View>
-                    ) : null}
-
-                    {currentTrip.started || currentTrip.ended ? (
-                      <View>
-                        <Text className="text-lg font-ubold text-secondary underline">
-                          Time:
-                        </Text>
-                        <Text
-                          className="text-lg font-usemibold text-secondary"
-                          numberOfLines={1}
-                          ellipsizeMode="tail"
-                        >
-                          {currentTripTime}
-                        </Text>
-                      </View>
-                    ) : null}
-                  </View>
-                )
-              )}
-            </View>
-
-            <View className="flex-1 bg-secondary p-2 rounded-lg">
-              {/* Content for the second view goes here */}
-            </View>
-          </View>
-          <View className="flex flex-row">
-            {!isEditing ? (
-              <Button
-                title="Edit"
-                handlePress={() => handleEdit(true)}
-                color="secondary"
-                containerStyle="flex-1 h-12 mt-2 mr-2"
-                textStyle="text-lg"
-              />
-            ) : (
-              <View className="flex-1 flex flex-row mr-2">
-                <Button
-                  title="Save"
-                  handlePress={saveChanges}
-                  color="secondary"
-                  containerStyle="flex-1 h-12 mt-2 mr-2"
-                  textStyle="text-lg"
-                  style={{ flex: 0.25 }}
-                />
-                <Button
-                  title="Cancel"
-                  handlePress={() => handleEdit(false)}
-                  color="secondary"
-                  containerStyle="flex-1 h-12 mt-2"
-                  textStyle="text-lg"
-                  style={{ flex: 0.25 }}
-                />
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View className="h-96 flex flex-col justify-between ">
+            {isLoading ? (
+              <View className="flex-1 flex items-center justify-center">
+                <Flow size={50} color="#92AD94" />
               </View>
+            ) : (
+              <>
+                <View className="flex flex-col items-center mb-1 h-10">
+                  {!isEditing ? (
+                    currentTrip ? (
+                      <Text
+                        className="text-5xl font-ubold text-secondary"
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {currentTrip.name}
+                      </Text>
+                    ) : null
+                  ) : (
+                    <CustomTextInput
+                      value={editTitle}
+                      handleChangeText={setEditTitle}
+                      containerStyles="w-full"
+                      inputStyles="bg-accentDark h-[34px] text-secondary text-3xl pl-3"
+                      textColor="#92AD94"
+                      returnKeyType="next"
+                      onSubmitEditing={() =>
+                        editStartLocationRef.current.focus()
+                      }
+                      blurOnSubmit={false}
+                      ref={editTitleRef}
+                    />
+                  )}
+                </View>
+                <View className="flex flex-row flex-1 ">
+                  <View className="flex-1 flex flex-col bg-accentDark p-2 rounded-lg justify-between mr-2">
+                    {currentTrip && (
+                      <View className="flex flex-col space-y-2">
+                        <View>
+                          <Text className="text-lg font-ubold text-secondary underline">
+                            Starting Location:
+                          </Text>
+
+                          <View className="h-6">
+                            {!isEditing ? (
+                              <Text
+                                className="text-lg font-usemibold text-secondary"
+                                numberOfLines={1}
+                                ellipsizeMode="tail"
+                              >
+                                {currentTrip.starting_location}
+                              </Text>
+                            ) : (
+                              <CustomTextInput
+                                value={editStartLocation}
+                                handleChangeText={setEditStartLocation}
+                                containerStyles="w-full"
+                                inputStyles="bg-accentDark h-[18px] text-secondary pl-2"
+                                textColor="#92AD94"
+                                returnKeyType="next"
+                                onSubmitEditing={() =>
+                                  editEndLocationRef.current.focus()
+                                }
+                                blurOnSubmit={false}
+                                ref={editStartLocationRef}
+                              />
+                            )}
+                          </View>
+                        </View>
+
+                        <View>
+                          <Text className="text-lg font-ubold text-secondary underline">
+                            Ending Location:
+                          </Text>
+
+                          <View className="h-6">
+                            {!isEditing ? (
+                              <Text
+                                className="text-lg font-usemibold text-secondary"
+                                numberOfLines={1}
+                                ellipsizeMode="tail"
+                              >
+                                {currentTrip.ending_location}
+                              </Text>
+                            ) : (
+                              <CustomTextInput
+                                value={editEndLocation}
+                                handleChangeText={setEditEndLocation}
+                                containerStyles="w-full"
+                                inputStyles="bg-accentDark h-[18px] text-secondary pl-2"
+                                textColor="#92AD94"
+                                returnKeyType="done"
+                                onSubmitEditing={saveChanges}
+                                ref={editEndLocationRef}
+                              />
+                            )}
+                          </View>
+                        </View>
+
+                        {currentTrip.started || currentTrip.ended ? (
+                          <View>
+                            <Text className="text-lg font-ubold text-secondary underline">
+                              Starting Time:
+                            </Text>
+                            <Text
+                              className="text-lg font-usemibold text-secondary"
+                              numberOfLines={1}
+                              ellipsizeMode="tail"
+                            >
+                              {new Date(
+                                currentTrip.starting_date
+                              ).toLocaleString()}
+                            </Text>
+                          </View>
+                        ) : null}
+
+                        {currentTrip.ended ? (
+                          <View>
+                            <Text className="text-lg font-ubold text-secondary underline">
+                              Ending Time:
+                            </Text>
+                            <Text
+                              className="text-lg font-usemibold text-secondary"
+                              numberOfLines={1}
+                              ellipsizeMode="tail"
+                            >
+                              {new Date(
+                                currentTrip.ending_date
+                              ).toLocaleString()}
+                            </Text>
+                          </View>
+                        ) : null}
+
+                        {currentTrip.started || currentTrip.ended ? (
+                          <View>
+                            <Text className="text-lg font-ubold text-secondary underline">
+                              Time:
+                            </Text>
+                            <Text
+                              className="text-lg font-usemibold text-secondary"
+                              numberOfLines={1}
+                              ellipsizeMode="tail"
+                            >
+                              {currentTripTime}
+                            </Text>
+                          </View>
+                        ) : null}
+                      </View>
+                    )}
+                  </View>
+
+                  <View className="flex-1 bg-accentDark p-2 rounded-lg">
+                    <View className="flex-1 flex flex-col space-y-2">
+                      {tripLicensePlates.length === 0 ? (
+                        <View className="flex-1 flex items-center justify-center">
+                          <Text className="text-lg font-usemibold text-secondary text-center">
+                            No license plates seen during this trip
+                          </Text>
+                        </View>
+                      ) : (
+                        <View className="">
+                          <Text className="text-lg font-ubold text-secondary underline">
+                            License Plates:
+                          </Text>
+                          <FlatList
+                            data={tripLicensePlates}
+                            keyExtractor={(item) => item.id.toString()}
+                            renderItem={({ item }) => (
+                              <View className="flex flex-row items-center justify-between">
+                                <Text className="text-lg font-usemibold text-secondary">
+                                  {item.plate_title}
+                                </Text>
+                                <Image
+                                  source={{
+                                    uri: `data:image/png;base64,${item.plate_img}`,
+                                  }}
+                                  className="w-12 h-6"
+                                  contentFit="cover"
+                                />
+                              </View>
+                            )}
+                          />
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                </View>
+                <View className="flex flex-row">
+                  {!isEditing ? (
+                    <Button
+                      title="Edit"
+                      handlePress={() => handleEdit(true)}
+                      color="secondary"
+                      containerStyle="flex-1 h-12 mt-2 mr-2"
+                      textStyle="text-lg"
+                    />
+                  ) : (
+                    <View className="flex-1 flex flex-row mr-2">
+                      <Button
+                        title="Save"
+                        handlePress={saveChanges}
+                        color="secondary"
+                        containerStyle="flex-1 h-12 mt-2 mr-2"
+                        textStyle="text-lg"
+                        style={{ flex: 0.25 }}
+                      />
+                      <Button
+                        title="Cancel"
+                        handlePress={() => handleEdit(false)}
+                        color="secondary"
+                        containerStyle="flex-1 h-12 mt-2"
+                        textStyle="text-lg"
+                        style={{ flex: 0.25 }}
+                      />
+                    </View>
+                  )}
+                  <Button
+                    title="Close"
+                    handlePress={closeModal}
+                    color="secondary"
+                    containerStyle="flex-1 h-12 mt-2"
+                    textStyle="text-lg"
+                    style={{ flex: 1 }}
+                  />
+                </View>
+              </>
             )}
-            <Button
-              title="Close"
-              handlePress={closeModal}
-              color="secondary"
-              containerStyle="flex-1 h-12 mt-2"
-              textStyle="text-lg"
-              style={{ flex: 1 }}
-            />
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </CustomModal>
     </>
   );
