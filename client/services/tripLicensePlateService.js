@@ -41,11 +41,11 @@ export const getTripLicensePlateById = async (tripId, licensePlateId) => {
   }
 };
 
-export const createTripLicensePlate = async (tripId, licensePlateData) => {
+export const createTripLicensePlate = async (tripId, licensePlateId) => {
   try {
-    const response = await api.post(`/trips/${tripId}/license-plates`, {
-      ...licensePlateData,
-    });
+    const response = await api.post(
+      `/trips/${tripId}/license-plates/${licensePlateId}`
+    );
     return response.data;
   } catch (error) {
     console.error(

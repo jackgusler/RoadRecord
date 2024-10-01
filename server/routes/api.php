@@ -51,6 +51,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/trips/{tripId}/license-plates', [TripLicensePlateController::class, 'getTripLicensePlatesByTrip']);
     Route::get('/trips/{tripId}/license-plates/details', [TripLicensePlateController::class, 'getTripLicensePlateDetailsByTrip']);
     Route::get('/trips/{tripId}/license-plates/{id}', [TripLicensePlateController::class, 'getTripLicensePlateById']);
-    Route::post('/trips/{tripId}/license-plates', [TripLicensePlateController::class, 'createTripLicensePlate']);
+    Route::post('/trips/{tripId}/license-plates/{id}', [TripLicensePlateController::class, 'createTripLicensePlate']);
     Route::delete('/trips/license-plates/{id}', [TripLicensePlateController::class, 'deleteTripLicensePlateById']);
 });

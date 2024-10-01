@@ -20,6 +20,7 @@ import {
   getLicensePlatesByState,
 } from "../services/licensePlateService";
 import { router } from "expo-router";
+import * as Location from "expo-location";
 
 const StateList = ({ state, type }) => {
   const { isLoading, setIsLoading, fetchLicensePlates } = useGlobalContext();
@@ -168,7 +169,27 @@ const StateList = ({ state, type }) => {
     setIsSelectionMode(false);
     setIsLoading(true);
     try {
-      await batchUpdateUserLicensePlates(userSelections);
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.error("Permission to access location was denied");
+        return;
+      }
+
+      // Get the current location
+      let coords = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = coords.coords;
+
+      // Reverse geocoding to get town and state using Nominatim API
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+      );
+      const data = await response.json();
+      const town =
+        data.address.city || data.address.town || data.address.village;
+      const state = data.address.state;
+      const location = `${town}, ${state}`;
+
+      await batchUpdateUserLicensePlates(userSelections, location);
       if (type === "profile") {
         fetchUserLicensePlates(true);
       }

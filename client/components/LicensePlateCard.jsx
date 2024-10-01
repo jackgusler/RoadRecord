@@ -21,6 +21,7 @@ const LicensePlateCard = ({
 
   const [isSeen, setIsSeen] = useState();
   const [isFavorite, setIsFavorite] = useState();
+  const [plateLocation, setPlateLocation] = useState();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   useEffect(() => {
@@ -32,106 +33,59 @@ const LicensePlateCard = ({
       (lp) => lp.license_plate_id === plate.id && lp.seen
     );
     setIsSeen(seen ? true : false);
+    const location = userLicensePlates.find(
+      (lp) => lp.license_plate_id === plate.id && lp.location
+    );
+    setPlateLocation(location ? location.location : null);
   }, [userLicensePlates]);
 
   const handleToggle = async (isToggled, toggleType) => {
+    const location = await getLocation();
+    if (!location) return;
+
     try {
       if (toggleType === "favorite") {
         if (isToggled) {
           if (!isSeen) {
-            Alert.alert(
+            showAlert(
               "Are you sure?",
               "Unfavoriting this license plate will remove it from your selections. Do you want to continue?",
-              [
-                {
-                  text: "Cancel",
-                  onPress: () => {},
-                  style: "cancel",
-                },
-                {
-                  text: "Unfavorite",
-                  onPress: async () => {
-                    await userLP.unfavoriteUserLicensePlate(plate.id);
-                    setIsFavorite(false);
-                    handleRefresh();
-                    fetchLicensePlates();
-                  },
-                },
-              ]
+              async () => {
+                await userLP.unfavoriteUserLicensePlate(plate.id);
+                setIsFavorite(false);
+                handleRefresh();
+                fetchLicensePlates();
+              }
             );
           } else {
             await userLP.unfavoriteUserLicensePlate(plate.id);
             setIsFavorite(false);
           }
         } else {
-          await userLP.favoriteUserLicensePlate(plate.id);
+          await userLP.favoriteUserLicensePlate(plate.id, location);
           setIsFavorite(true);
         }
       } else if (toggleType === "seen") {
         if (isToggled) {
           if (!isFavorite) {
-            Alert.alert(
+            showAlert(
               "Are you sure?",
               "Unseeing this license plate will remove it from your selections. Do you want to continue?",
-              [
-                {
-                  text: "Cancel",
-                  onPress: () => {},
-                  style: "cancel",
-                },
-                {
-                  text: "Unsee",
-                  onPress: async () => {
-                    await userLP.unseenUserLicensePlate(plate.id);
-                    setIsSeen(false);
-                    handleRefresh();
-                    fetchLicensePlates();
-                  },
-                },
-              ]
+              async () => {
+                await userLP.unseenUserLicensePlate(plate.id);
+                setIsSeen(false);
+                handleRefresh();
+                fetchLicensePlates();
+              }
             );
           } else {
             await userLP.unseenUserLicensePlate(plate.id);
             setIsSeen(false);
           }
         } else {
-          try {
-            await userLP.seenUserLicensePlate(plate.id);
-          } catch (error) {
-            console.error("Error toggling seen status:", error);
-          }
-
-          if (currentTrip) {
-            try {
-              // Request location permissions
-              let { status } =
-                await Location.requestForegroundPermissionsAsync();
-              if (status !== "granted") {
-                console.error("Permission to access location was denied");
-                return;
-              }
-
-              // Get the current location
-              let location = await Location.getCurrentPositionAsync({});
-              const { latitude, longitude } = location.coords;
-
-              // Reverse geocoding to get town and state using Nominatim API
-              const response = await fetch(
-                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-              );
-              const data = await response.json();
-              const town =
-                data.address.city || data.address.town || data.address.village;
-              const state = data.address.state;
-
-              // Use the location and address in your API call
-              await createTripLicensePlate(currentTrip.id, {
-                license_plate_id: plate.id,
-                location_during_recording: `Town: ${town}, State: ${state}`,
-              });
-            } catch (error) {
-              console.error("Error adding license plate to trip:", error);
-            }
+          await userLP.seenUserLicensePlate(plate.id, location);
+          if (currentTrip && Object.keys(currentTrip).length > 0) {
+            await createTripLicensePlate(currentTrip.id, plate.id);
           }
           setIsSeen(true);
         }
@@ -141,6 +95,33 @@ const LicensePlateCard = ({
     } catch (error) {
       Alert.alert("Error", `Failed to toggle ${toggleType} status.`);
     }
+  };
+
+  const getLocation = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      console.error("Permission to access location was denied");
+      return null;
+    }
+
+    let coords = await Location.getCurrentPositionAsync({});
+    const { latitude, longitude } = coords.coords;
+
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+    );
+    const data = await response.json();
+    const town = data.address.city || data.address.town || data.address.village;
+    const state = data.address.state;
+
+    return `${town}, ${state}`;
+  };
+
+  const showAlert = (title, message, onConfirm) => {
+    Alert.alert(title, message, [
+      { text: "Cancel", onPress: () => {}, style: "cancel" },
+      { text: "Confirm", onPress: onConfirm },
+    ]);
   };
 
   const toggleModal = () => {
@@ -204,6 +185,20 @@ const LicensePlateCard = ({
           <Text className="text-primary font-ubold text-2xl text-center mt-2">
             {plate.plate_title}
           </Text>
+          {plateLocation && (
+            <View className="flex-row items-center justify-center">
+              <Text className="text-secondary text-lg font-ubold text-center">
+                Seen in:{" "}
+              </Text>
+              <Text
+                className="text-secondary text-lg font-usemibold text-center"
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {plateLocation}
+              </Text>
+            </View>
+          )}
         </View>
         <View className="flex-row justify-between w-100">
           <Button

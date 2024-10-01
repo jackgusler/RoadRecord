@@ -35,17 +35,12 @@ class TripLicensePlateController extends Controller
     }
 
     // Create a new trip license plate
-    public function createTripLicensePlate(Request $request, $tripId)
+    public function createTripLicensePlate($tripId, $licensePlateId)
     {
-        $validatedData = $request->validate([
-            'license_plate_id' => 'required|integer',
-            'location_during_recording' => 'required|string',
+        $tripLicensePlate = TripLicensePlate::create([
+            'trip_id' => $tripId,
+            'license_plate_id' => $licensePlateId
         ]);
-
-        $validatedData['trip_id'] = $tripId;
-        $validatedData['recorded_at'] = date('Y-m-d H:i:s');
-
-        $tripLicensePlate = TripLicensePlate::create($validatedData);
 
         return response()->json($tripLicensePlate);
     }

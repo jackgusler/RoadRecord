@@ -7,6 +7,7 @@ use App\Models\LicensePlate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use GuzzleHttp\Client;
 
 class UserLicensePlateController extends Controller
 {
@@ -60,9 +61,10 @@ class UserLicensePlateController extends Controller
     }
 
     // Favorite a license plate
-    public function favoriteUserLicensePlate($id)
+    public function favoriteUserLicensePlate(Request $request, $id)
     {
         $userId = Auth::id();
+        $location = $request->location;
 
         $userLicensePlate = UserLicensePlate::where('user_id', $userId)
             ->where('license_plate_id', $id)
@@ -77,8 +79,9 @@ class UserLicensePlateController extends Controller
             UserLicensePlate::create([
                 'user_id' => $userId,
                 'license_plate_id' => $id,
+                'location' => $location,
                 'favorite' => true,
-                'seen' => false, // Assuming default value for 'seen'
+                'seen' => false,
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
@@ -115,9 +118,10 @@ class UserLicensePlateController extends Controller
     }
 
     // Mark a license plate as seen (add to user_lp)
-    public function seenUserLicensePlate($id)
+    public function seenUserLicensePlate(Request $request, $id)
     {
         $userId = Auth::id();
+        $location = $request->location;
 
         $userLicensePlate = UserLicensePlate::where('user_id', $userId)
             ->where('license_plate_id', $id)
@@ -132,7 +136,8 @@ class UserLicensePlateController extends Controller
             UserLicensePlate::create([
                 'user_id' => $userId,
                 'license_plate_id' => $id,
-                'favorite' => false, // Assuming default value for 'favorite'
+                'location' => $location,
+                'favorite' => false,
                 'seen' => true,
                 'created_at' => now(),
                 'updated_at' => now()
@@ -172,21 +177,27 @@ class UserLicensePlateController extends Controller
     // Batch update license plates
     public function batchUpdateUserLicensePlates(Request $request)
     {
-        $userSelections = $request->userSelections;
+        $userSelections = $request->input('userSelections');
+        $location = $request->input('location');
+
         try {
             foreach ($userSelections as $id => $selection) {
                 $selection = json_decode($selection, true);
                 $favorite = $selection['favorite'];
                 $seen = $selection['seen'];
 
+                // Create a new Request object for each call
+                $newRequest = new Request();
+                $newRequest->replace(['location' => $location]);
+
                 if ($favorite) {
-                    $this->favoriteUserLicensePlate($id);
+                    $this->favoriteUserLicensePlate($newRequest, $id);
                 } else {
                     $this->unfavoriteUserLicensePlate($id);
                 }
 
                 if ($seen) {
-                    $this->seenUserLicensePlate($id);
+                    $this->seenUserLicensePlate($newRequest, $id);
                 } else {
                     $this->unseenUserLicensePlate($id);
                 }

@@ -16,6 +16,7 @@ import { getTripById, updateTrip } from "../services/tripService";
 import { Flow } from "react-native-animated-spinkit";
 import CustomTextInput from "./CustomTextInput";
 import { getTripLicensePlateDetailsByTrip } from "../services/tripLicensePlateService";
+import LicensePlateCard from "./LicensePlateCard";
 
 const TripCard = ({ trip, onDelete, onStart, onEnd, onSave }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -277,7 +278,7 @@ const TripCard = ({ trip, onDelete, onStart, onEnd, onSave }) => {
                     />
                   )}
                 </View>
-                <View className="flex flex-row flex-1 ">
+                <View className="flex flex-row flex-1">
                   <View className="flex-1 flex flex-col bg-accentDark p-2 rounded-lg justify-between mr-2">
                     {currentTrip && (
                       <View className="flex flex-col space-y-2">
@@ -394,35 +395,41 @@ const TripCard = ({ trip, onDelete, onStart, onEnd, onSave }) => {
                     )}
                   </View>
 
-                  <View className="flex-1 bg-accentDark p-2 rounded-lg">
-                    <View className="flex-1 flex flex-col space-y-2">
+                  <View className="flex-1 bg-accentDark rounded-lg px-2">
+                    <View className="flex-1 flex flex-col">
                       {tripLicensePlates.length === 0 ? (
-                        <View className="flex-1 flex items-center justify-center">
-                          <Text className="text-lg font-usemibold text-secondary text-center">
-                            No license plates seen during this trip
-                          </Text>
-                        </View>
+                        trip.ended ? (
+                          <View className="flex-1 flex items-center justify-center">
+                            <Text className="text-lg font-usemibold text-secondary text-center">
+                              No license plates seen during this trip
+                            </Text>
+                          </View>
+                        ) : trip.started && !trip.ended ? (
+                          <View className="flex-1 flex items-center justify-center">
+                            <Text className="text-lg font-usemibold text-secondary text-center">
+                              No license plates seen yet
+                            </Text>
+                          </View>
+                        ) : (
+                          <View className="flex-1 flex items-center justify-center">
+                            <Text className="text-lg font-usemibold text-secondary text-center">
+                              Start the trip to see license plates
+                            </Text>
+                          </View>
+                        )
                       ) : (
-                        <View className="">
-                          <Text className="text-lg font-ubold text-secondary underline">
-                            License Plates:
-                          </Text>
+                        <View className="items-center h-full w-full">
                           <FlatList
                             data={tripLicensePlates}
                             keyExtractor={(item) => item.id.toString()}
                             renderItem={({ item }) => (
-                              <View className="flex flex-row items-center justify-between">
-                                <Text className="text-lg font-usemibold text-secondary">
-                                  {item.plate_title}
-                                </Text>
-                                <Image
-                                  source={{
-                                    uri: `data:image/png;base64,${item.plate_img}`,
-                                  }}
-                                  className="w-12 h-6"
-                                  contentFit="cover"
-                                />
-                              </View>
+                              <LicensePlateCard plate={item} trip={trip.id} handleRefresh={() => {}} />
+                            )}
+                            ItemSeparatorComponent={() => (
+                              <View style={{ height: 5 }} />
+                            )}
+                            ListHeaderComponent={() => (
+                              <View style={{ paddingTop: 10 }} />
                             )}
                           />
                         </View>

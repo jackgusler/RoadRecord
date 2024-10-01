@@ -24,8 +24,6 @@ class TripLicensePlate extends Model
     protected $fillable = [
         'trip_id',
         'license_plate_id',
-        'recorded_at',
-        'location_during_recording',
     ];
 
     /**

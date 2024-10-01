@@ -14,6 +14,7 @@ class UserLicensePlate extends Model
     protected $fillable = [
         'user_id',
         'license_plate_id',
+        'location',
         'favorite',
         'seen'
     ];
