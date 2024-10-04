@@ -1,4 +1,3 @@
-// sign-in.jsx
 import { Alert, Text, View } from "react-native";
 import React, { useRef, useState } from "react";
 import Button from "../../components/Button";
@@ -19,7 +18,11 @@ const SignIn = () => {
   const emailRef = useRef();
   const passwordRef = useRef();
 
-  const startLocationUpdates = async (userId, currentLocation, currentTimezone) => {
+  const startLocationUpdates = async (
+    userId,
+    currentLocation,
+    currentTimezone
+  ) => {
     let locationSubscription;
     const prevCoords = { latitude: null, longitude: null };
 
@@ -112,24 +115,27 @@ const SignIn = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-accent">
+    <SafeAreaView className="flex-1 bg-primary">
       <View className="flex-1 justify-between">
         <View className="items-center">
-          <Text className="text-4xl font-ubold text-primary my-8">Sign in</Text>
+          <Text className="text-4xl font-ubold text-secondary my-8">
+            Sign in
+          </Text>
         </View>
         <KeyboardAwareScrollView
-          className="flex-1 px-4"
-          contentContainerStyle={{ paddingBottom: 20 }}
+          className="px-4"
+          contentContainerStyle={{ flexGrow: 1, justifyContent: "center", paddingBottom: 35 }}
           extraScrollHeight={20}
           enableOnAndroid={true}
         >
           <CustomTextInput
             label="Email"
+            labelColor="secondary"
             placeholder="Email"
             handleChangeText={setEmail}
             value={email}
             containerStyles="mb-4 w-full"
-            inputStyles="h-16"
+            inputStyles="h-16 bg-accent text-primary"
             textColor="#748B75"
             returnKeyType="next"
             onSubmitEditing={() => passwordRef.current.focus()}
@@ -138,11 +144,12 @@ const SignIn = () => {
           />
           <CustomTextInput
             label="Password"
+            labelColor="secondary"
             placeholder="Password"
             handleChangeText={setPassword}
             value={password}
             containerStyles="mb-4 w-full"
-            inputStyles="h-16"
+            inputStyles="h-16 bg-accent text-primary"
             textColor="#748B75"
             secureTextEntry={true}
             returnKeyType="done"
@@ -151,12 +158,13 @@ const SignIn = () => {
             ref={passwordRef}
           />
         </KeyboardAwareScrollView>
-        <View className="px-4 mb-4">
+        <View className="px-4 mb-4 items-center w-full">
           <Button
             title="Sign in"
             handlePress={handleSignIn}
-            color="primary"
-            textStyle={"text-lg"}
+            color="secondary"
+            containerStyle="w-full"
+            textStyle="text-lg"
           />
         </View>
       </View>

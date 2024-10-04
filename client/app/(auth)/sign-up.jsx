@@ -112,10 +112,12 @@ const SignUp = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-accent">
+    <SafeAreaView className="flex-1 bg-primary">
       <View className="flex-1 justify-between">
         <View className="items-center">
-          <Text className="text-4xl font-ubold text-primary my-8">Sign up</Text>
+          <Text className="text-4xl font-ubold text-secondary my-8">
+            Sign up
+          </Text>
         </View>
         <KeyboardAwareScrollView
           className="flex-1 px-4"
@@ -127,11 +129,12 @@ const SignUp = () => {
             <View className="flex-1 mr-2">
               <CustomTextInput
                 label="First name"
+                labelColor="secondary"
                 placeholder="First name"
                 handleChangeText={setFirstName}
                 value={first_name}
                 containerStyles="mb-4 w-full"
-                inputStyles="h-16"
+                inputStyles="h-16 bg-accent text-primary"
                 textColor="#748B75"
                 returnKeyType="next"
                 onSubmitEditing={() => lastNameRef.current.focus()}
@@ -142,11 +145,12 @@ const SignUp = () => {
             <View className="flex-1 ml-2">
               <CustomTextInput
                 label="Last name"
+                labelColor="secondary"
                 placeholder="Last name"
                 handleChangeText={setLastName}
                 value={last_name}
                 containerStyles="mb-4 w-full"
-                inputStyles="h-16"
+                inputStyles="h-16 bg-accent text-primary"
                 textColor="#748B75"
                 returnKeyType="next"
                 onSubmitEditing={() => usernameRef.current.focus()}
@@ -157,11 +161,12 @@ const SignUp = () => {
           </View>
           <CustomTextInput
             label="Username"
+            labelColor="secondary"
             placeholder="Username"
             handleChangeText={setUsername}
             value={username}
             containerStyles="mb-4 w-full"
-            inputStyles="h-16"
+            inputStyles="h-16 bg-accent text-primary"
             textColor="#748B75"
             returnKeyType="next"
             onSubmitEditing={() => emailRef.current.focus()}
@@ -170,11 +175,12 @@ const SignUp = () => {
           />
           <CustomTextInput
             label="Email"
+            labelColor="secondary"
             placeholder="Email"
             handleChangeText={setEmail}
             value={email}
             containerStyles="mb-4 w-full"
-            inputStyles="h-16"
+            inputStyles="h-16 bg-accent text-primary"
             textColor="#748B75"
             returnKeyType="next"
             onSubmitEditing={() => passwordRef.current.focus()}
@@ -183,11 +189,12 @@ const SignUp = () => {
           />
           <CustomTextInput
             label="Password"
+            labelColor="secondary"
             placeholder="Password"
             handleChangeText={setPassword}
             value={password}
             containerStyles="mb-4 w-full"
-            inputStyles="h-16"
+            inputStyles="h-16 bg-accent text-primary"
             textColor="#748B75"
             secureTextEntry={true}
             returnKeyType="next"
@@ -197,11 +204,12 @@ const SignUp = () => {
           />
           <CustomTextInput
             label="Confirm Password"
+            labelColor="secondary"
             placeholder="Confirm Password"
             handleChangeText={setConfirmPassword}
             value={confirmPassword}
             containerStyles="mb-4 w-full"
-            inputStyles="h-16"
+            inputStyles="h-16 bg-accent text-primary"
             textColor="#748B75"
             secureTextEntry={true}
             returnKeyType="done"
@@ -210,12 +218,13 @@ const SignUp = () => {
             ref={confirmPasswordRef}
           />
         </KeyboardAwareScrollView>
-        <View className="px-4 mb-4">
+        <View className="px-4 mb-4 items-center w-full">
           <Button
             title="Sign up"
             handlePress={handleSignUp}
-            color="primary"
-            textStyle={"text-lg"}
+            color="secondary"
+            containerStyle="w-full"
+            textStyle="text-lg"
           />
         </View>
       </View>
