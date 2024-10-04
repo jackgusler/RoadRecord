@@ -61,21 +61,3 @@ export const signOut = async () => {
     };
   }
 };
-
-export const checkAuthStatus = async () => {
-  try {
-    const token = await AsyncStorage.getItem("sanctum_token");
-    if (token) {
-      api.defaults.headers.common["Authorization"] = token;
-      const response = await api.post("/auth/status");
-      return response.data.authenticated;
-    }
-    return false;
-  } catch (error) {
-    console.error(
-      "Error checking auth status:",
-      error.response ? error.response.data : error.message
-    );
-    return false;
-  }
-};

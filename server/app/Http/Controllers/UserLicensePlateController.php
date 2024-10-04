@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\UserLicensePlate;
 use App\Models\LicensePlate;
+use App\Models\TripLicensePlate;
+use App\Models\Trip;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -61,10 +64,10 @@ class UserLicensePlateController extends Controller
     }
 
     // Favorite a license plate
-    public function favoriteUserLicensePlate(Request $request, $id)
+    public function favoriteUserLicensePlate($id)
     {
         $userId = Auth::id();
-        $location = $request->location;
+        $location = Auth::user()->location;
 
         $userLicensePlate = UserLicensePlate::where('user_id', $userId)
             ->where('license_plate_id', $id)
@@ -107,21 +110,34 @@ class UserLicensePlateController extends Controller
             return response()->json(['message' => 'License plate not found in user_lp'], 404);
         }
 
-        // If both 'favorite' and 'seen' are false, delete the record
-        UserLicensePlate::where('user_id', $userId)
+        // Determine if the record should be deleted
+        $shouldDelete = UserLicensePlate::where('user_id', $userId)
             ->where('license_plate_id', $id)
             ->where('favorite', false)
             ->where('seen', false)
-            ->delete();
+            ->exists();
+
+        if ($shouldDelete) {
+            $trip_ids = Trip::where('user_id', $userId)
+                ->pluck('id');
+
+            TripLicensePlate::whereIn('trip_id', $trip_ids)
+                ->where('license_plate_id', $id)
+                ->delete();
+
+            UserLicensePlate::where('user_id', $userId)
+                ->where('license_plate_id', $id)
+                ->delete();
+        }
 
         return response()->json(['message' => 'License plate unfavorited successfully']);
     }
 
     // Mark a license plate as seen (add to user_lp)
-    public function seenUserLicensePlate(Request $request, $id)
+    public function seenUserLicensePlate($id)
     {
         $userId = Auth::id();
-        $location = $request->location;
+        $location = Auth::user()->location;
 
         $userLicensePlate = UserLicensePlate::where('user_id', $userId)
             ->where('license_plate_id', $id)
@@ -164,12 +180,25 @@ class UserLicensePlateController extends Controller
             return response()->json(['message' => 'License plate not found in user_lp'], 404);
         }
 
-        // If both 'favorite' and 'seen' are false, delete the record
-        UserLicensePlate::where('user_id', $userId)
+        // Determine if the record should be deleted
+        $shouldDelete = UserLicensePlate::where('user_id', $userId)
             ->where('license_plate_id', $id)
             ->where('favorite', false)
             ->where('seen', false)
-            ->delete();
+            ->exists();
+
+        if ($shouldDelete) {
+            $trip_ids = Trip::where('user_id', $userId)
+                ->pluck('id');
+
+            TripLicensePlate::whereIn('trip_id', $trip_ids)
+                ->where('license_plate_id', $id)
+                ->delete();
+
+            UserLicensePlate::where('user_id', $userId)
+                ->where('license_plate_id', $id)
+                ->delete();
+        }
 
         return response()->json(['message' => 'License plate removed from user_lp']);
     }
@@ -178,7 +207,7 @@ class UserLicensePlateController extends Controller
     public function batchUpdateUserLicensePlates(Request $request)
     {
         $userSelections = $request->input('userSelections');
-        $location = $request->input('location');
+        $location = Auth::user()->location;
 
         try {
             foreach ($userSelections as $id => $selection) {

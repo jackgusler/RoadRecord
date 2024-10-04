@@ -24,6 +24,8 @@ class User extends Authenticatable
         'first_name',
         'last_name',
         'profile_img',
+        'location',
+        'timezone',
     ];
 
     /**

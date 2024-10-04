@@ -56,10 +56,10 @@ export const createTripLicensePlate = async (tripId, licensePlateId) => {
   }
 };
 
-export const deleteTripLicensePlate = async (licensePlateId) => {
+export const deleteTripLicensePlate = async (tripId, licensePlateId) => {
   try {
     const response = await api.delete(
-      `/trips/license-plates/${licensePlateId}`
+      `/trips/${tripId}/license-plates/${licensePlateId}`
     );
     return response.data;
   } catch (error) {

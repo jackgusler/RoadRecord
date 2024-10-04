@@ -46,9 +46,9 @@ class TripLicensePlateController extends Controller
     }
 
     // Delete trip license plate by ID
-    public function deleteTripLicensePlateById($id)
+    public function deleteTripLicensePlateById($tripId, $licensePlateId)
     {
-        $tripLicensePlate = TripLicensePlate::findOrFail($id);
+        $tripLicensePlate = TripLicensePlate::where('trip_id', $tripId)->where('license_plate_id', $licensePlateId)->firstOrFail();
         $tripLicensePlate->delete();
 
         return response()->json(['message' => 'Trip license plate deleted successfully']);

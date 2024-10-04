@@ -8,6 +8,7 @@ import * as ImageManipulator from "expo-image-manipulator";
 import { updateUser } from "../services/userService";
 import { signOut } from "../services/authService";
 import { router } from "expo-router";
+import Button from "./Button";
 
 const ProfileHeader = () => {
   const { user, setUser, setIsLoggedIn } = useGlobalContext();
@@ -95,6 +96,13 @@ const ProfileHeader = () => {
           @{user.username}
         </Text>
       </View>
+      <Button
+        title="Sign Out"
+        color="primaryDark"
+        handlePress={handleSignOut}
+        containerStyle="mt-4"
+        textStyle=""
+      />
     </View>
   );
 };

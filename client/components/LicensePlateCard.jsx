@@ -6,7 +6,6 @@ import * as userLP from "../services/userLicensePlateService";
 import { createTripLicensePlate } from "../services/tripLicensePlateService";
 import { useGlobalContext } from "../context/AuthContext";
 import CustomModal from "./CustomModal";
-import * as Location from "expo-location";
 
 const LicensePlateCard = ({
   plate,
@@ -22,6 +21,7 @@ const LicensePlateCard = ({
   const [isSeen, setIsSeen] = useState();
   const [isFavorite, setIsFavorite] = useState();
   const [plateLocation, setPlateLocation] = useState();
+  const [plateSeenAt, setPlateSeenAt] = useState();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   useEffect(() => {
@@ -37,84 +37,63 @@ const LicensePlateCard = ({
       (lp) => lp.license_plate_id === plate.id && lp.location
     );
     setPlateLocation(location ? location.location : null);
+    const seenAt = userLicensePlates.find(
+      (lp) => lp.license_plate_id === plate.id && lp.created_at
+    );
+    setPlateSeenAt(
+      seenAt ? new Date(seenAt.created_at).toLocaleString() : null
+    );
   }, [userLicensePlates]);
 
   const handleToggle = async (isToggled, toggleType) => {
-    const location = await getLocation();
-    if (!location) return;
-
-    try {
-      if (toggleType === "favorite") {
-        if (isToggled) {
-          if (!isSeen) {
-            showAlert(
-              "Are you sure?",
-              "Unfavoriting this license plate will remove it from your selections. Do you want to continue?",
-              async () => {
-                await userLP.unfavoriteUserLicensePlate(plate.id);
-                setIsFavorite(false);
-                handleRefresh();
-                fetchLicensePlates();
-              }
-            );
-          } else {
-            await userLP.unfavoriteUserLicensePlate(plate.id);
-            setIsFavorite(false);
-          }
+    if (toggleType === "favorite") {
+      if (isToggled) {
+        if (!isSeen) {
+          showAlert(
+            "Are you sure?",
+            "Unseeing this license plate will remove it from your selections and/or trip. Do you want to continue?",
+            async () => {
+              await userLP.unfavoriteUserLicensePlate(plate.id);
+              setIsFavorite(false);
+              handleRefresh();
+              fetchLicensePlates();
+            }
+          );
         } else {
-          await userLP.favoriteUserLicensePlate(plate.id, location);
-          setIsFavorite(true);
+          await userLP.unfavoriteUserLicensePlate(plate.id);
+          setIsFavorite(false);
         }
-      } else if (toggleType === "seen") {
-        if (isToggled) {
-          if (!isFavorite) {
-            showAlert(
-              "Are you sure?",
-              "Unseeing this license plate will remove it from your selections. Do you want to continue?",
-              async () => {
-                await userLP.unseenUserLicensePlate(plate.id);
-                setIsSeen(false);
-                handleRefresh();
-                fetchLicensePlates();
-              }
-            );
-          } else {
-            await userLP.unseenUserLicensePlate(plate.id);
-            setIsSeen(false);
-          }
-        } else {
-          await userLP.seenUserLicensePlate(plate.id, location);
-          if (currentTrip && Object.keys(currentTrip).length > 0) {
-            await createTripLicensePlate(currentTrip.id, plate.id);
-          }
-          setIsSeen(true);
-        }
+      } else {
+        await userLP.favoriteUserLicensePlate(plate.id);
+        setIsFavorite(true);
       }
-
-      fetchLicensePlates();
-    } catch (error) {
-      Alert.alert("Error", `Failed to toggle ${toggleType} status.`);
+    } else if (toggleType === "seen") {
+      if (isToggled) {
+        if (!isFavorite) {
+          showAlert(
+            "Are you sure?",
+            "Unseeing this license plate will remove it from your selections and/or trip. Do you want to continue?",
+            async () => {
+              await userLP.unseenUserLicensePlate(plate.id);
+              setIsSeen(false);
+              handleRefresh();
+              fetchLicensePlates();
+            }
+          );
+        } else {
+          await userLP.unseenUserLicensePlate(plate.id);
+          setIsSeen(false);
+        }
+      } else {
+        await userLP.seenUserLicensePlate(plate.id);
+        if (currentTrip && Object.keys(currentTrip).length > 0) {
+          await createTripLicensePlate(currentTrip.id, plate.id);
+        }
+        setIsSeen(true);
+      }
     }
-  };
 
-  const getLocation = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      console.error("Permission to access location was denied");
-      return null;
-    }
-
-    let coords = await Location.getCurrentPositionAsync({});
-    const { latitude, longitude } = coords.coords;
-
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-    );
-    const data = await response.json();
-    const town = data.address.city || data.address.town || data.address.village;
-    const state = data.address.state;
-
-    return `${town}, ${state}`;
+    fetchLicensePlates();
   };
 
   const showAlert = (title, message, onConfirm) => {
@@ -196,6 +175,20 @@ const LicensePlateCard = ({
                 ellipsizeMode="tail"
               >
                 {plateLocation}
+              </Text>
+            </View>
+          )}
+          {plateSeenAt && (
+            <View className="flex-row items-center justify-center">
+              <Text className="text-secondary text-lg font-ubold text-center">
+                Seen at:{" "}
+              </Text>
+              <Text
+                className="text-secondary text-lg font-usemibold text-center"
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {plateSeenAt}
               </Text>
             </View>
           )}

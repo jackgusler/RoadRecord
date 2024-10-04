@@ -1,7 +1,8 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
-import { getCurrentUser } from "../services/userService";
+import { getCurrentUser, updateUser } from "../services/userService";
 import { getLicensePlatesByUser } from "../services/userLicensePlateService";
 import { getCurrentTrip } from "../services/tripService";
+import * as Location from "expo-location";
 
 const AuthContext = createContext();
 export const useGlobalContext = () => useContext(AuthContext);
@@ -20,12 +21,19 @@ export const AuthProvider = ({ children }) => {
         if (res) {
           setIsLoggedIn(true);
           setUser(res.user);
+          startLocationUpdates(
+            res.user.id,
+            res.user.location,
+            res.user.timezone
+          ); // Start location updates with current location and timezone
         } else {
           setIsLoggedIn(false);
           setUser(null);
         }
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        if (error.response && error.response.status === 401) {
+          setIsLoggedIn(false);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -59,6 +67,77 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error("Error fetching current trip:", error);
     }
+  };
+
+  const startLocationUpdates = async (
+    userId,
+    currentLocation,
+    currentTimezone
+  ) => {
+    let locationSubscription;
+    const prevCoords = { latitude: null, longitude: null };
+
+    const updateLocation = async (location) => {
+      const { latitude, longitude } = location.coords;
+
+      // Check if the coordinates have changed
+      if (
+        prevCoords.latitude === latitude &&
+        prevCoords.longitude === longitude
+      ) {
+        return; // Coordinates haven't changed, so do nothing
+      }
+
+      // Update the previous coordinates
+      prevCoords.latitude = latitude;
+      prevCoords.longitude = longitude;
+
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+      );
+      const data = await response.json();
+      const town =
+        data.address.city || data.address.town || data.address.village;
+      const state = data.address.state;
+      const newLocation = `${town}, ${state}`;
+
+      // Get the current timezone
+      const newTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      // Check if the new location or timezone is different from the current ones
+      if (newLocation === currentLocation && newTimezone === currentTimezone) {
+        return; // Location and timezone haven't changed, so do nothing
+      }
+
+      // Create FormData and append location and timezone data
+      const formData = new FormData();
+      formData.append("location", newLocation);
+      formData.append("timezone", newTimezone);
+
+      // Update user location and timezone in the backend
+      await updateUser(userId, formData);
+    };
+
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      console.error("Permission to access location was denied");
+      return;
+    }
+
+    locationSubscription = await Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.High,
+        timeInterval: 10000, // Update every 10 seconds
+        distanceInterval: 50, // Update every 50 meters
+      },
+      updateLocation
+    );
+
+    return () => {
+      if (locationSubscription) {
+        locationSubscription.remove();
+      }
+    };
   };
 
   return (

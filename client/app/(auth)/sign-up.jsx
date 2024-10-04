@@ -1,5 +1,5 @@
 import { Text, View, Alert } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Button from "../../components/Button";
 import CustomTextInput from "../../components/CustomTextInput";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -7,7 +7,8 @@ import { router } from "expo-router";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { signUp, signIn } from "../../services/authService";
 import { useGlobalContext } from "../../context/AuthContext";
-import { getCurrentUser } from "../../services/userService";
+import { getCurrentUser, updateUser } from "../../services/userService";
+import * as Location from "expo-location";
 
 const SignUp = () => {
   const { setUser, setIsLoggedIn } = useGlobalContext();
@@ -38,7 +39,16 @@ const SignUp = () => {
     }
 
     try {
-      const userData = { username, email, password, first_name, last_name };
+      const location = await getLocation();
+      const userData = {
+        username,
+        email,
+        password,
+        first_name,
+        last_name,
+        location,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      };
       const response = await signUp(userData);
 
       if (response.success) {
@@ -79,6 +89,26 @@ const SignUp = () => {
         error.message || "Sign-in failed. Please try again."
       );
     }
+  };
+
+  const getLocation = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      console.error("Permission to access location was denied");
+      return null;
+    }
+
+    let coords = await Location.getCurrentPositionAsync({});
+    const { latitude, longitude } = coords.coords;
+
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+    );
+    const data = await response.json();
+    const town = data.address.city || data.address.town || data.address.village;
+    const state = data.address.state;
+
+    return `${town}, ${state}`;
   };
 
   return (

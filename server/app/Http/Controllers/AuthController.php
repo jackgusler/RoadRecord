@@ -42,6 +42,8 @@ class AuthController extends Controller
             'first_name' => 'required',
             'last_name' => 'required',
             'profile_img' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'location' => 'required',
+            'timezone' => 'required',
         ]);
 
         if ($request->hasFile('profile_img')) {

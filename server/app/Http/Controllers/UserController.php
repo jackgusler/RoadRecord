@@ -43,6 +43,8 @@ class UserController extends Controller
             'first_name' => 'sometimes|string|max:255',
             'last_name' => 'sometimes|string|max:255',
             'profile_img' => 'sometimes|file|mimes:jpeg,png,jpg,gif,svg|max:5120',
+            'location' => 'sometimes|string|max:255',
+            'timezone' => 'sometimes|string|max:255',
         ]);
 
         // Hash the password if it is present in the request

@@ -53,15 +53,17 @@ const TripCard = ({ trip, onDelete, onStart, onEnd, onSave }) => {
       setCurrentTrip(trip);
       setCurrentTripTime(formatTime(trip.time));
     }
+    fetchTripLicensePlates();
+    setIsLoading(false);
+  };
 
+  const fetchTripLicensePlates = async () => {
     try {
       const licensePlates = await getTripLicensePlateDetailsByTrip(trip.id);
       setTripLicensePlates(licensePlates);
     } catch (error) {
       console.error("Error fetching trip license plates:", error);
     }
-
-    setIsLoading(false);
   };
 
   const closeModal = () => {
@@ -73,15 +75,13 @@ const TripCard = ({ trip, onDelete, onStart, onEnd, onSave }) => {
   };
 
   const formatTime = (time) => {
-    const [hours, minutes, seconds] = time
+    const [days, hours, minutes, seconds] = time
       .split(":")
       .map((time) => parseInt(time));
     let formattedTime = "";
 
-    if (hours >= 24) {
-      const days = Math.floor(hours / 24);
+    if (days > 0) {
       formattedTime += `${days}d `;
-      hours %= 24; // Get the remaining hours after converting to days
     }
     if (hours > 0) {
       formattedTime += `${hours}h `;
@@ -423,7 +423,12 @@ const TripCard = ({ trip, onDelete, onStart, onEnd, onSave }) => {
                             data={tripLicensePlates}
                             keyExtractor={(item) => item.id.toString()}
                             renderItem={({ item }) => (
-                              <LicensePlateCard plate={item} trip={trip.id} handleRefresh={() => {}} />
+                              <LicensePlateCard
+                                plate={item}
+                                handleRefresh={fetchTripLicensePlates}
+                                onLongPress={() => {}}
+                                onSelect={() => {}}
+                              />
                             )}
                             ItemSeparatorComponent={() => (
                               <View style={{ height: 5 }} />

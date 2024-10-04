@@ -68,11 +68,9 @@ export const getUserLicensePlateById = async (id) => {
   }
 };
 
-export const favoriteUserLicensePlate = async (id, location) => {
+export const favoriteUserLicensePlate = async (id) => {
   try {
-    const response = await api.post(`/user/license-plates/${id}/favorite`, {
-      location,
-    });
+    const response = await api.post(`/user/license-plates/${id}/favorite`);
     return response.data;
   } catch (error) {
     console.error(`Error favoriting license plate with id ${id}:`, error);
@@ -90,11 +88,9 @@ export const unfavoriteUserLicensePlate = async (id) => {
   }
 };
 
-export const seenUserLicensePlate = async (id, location) => {
+export const seenUserLicensePlate = async (id) => {
   try {
-    const response = await api.post(`/user/license-plates/${id}/seen`, {
-      location,
-    });
+    const response = await api.post(`/user/license-plates/${id}/seen`);
     return response.data;
   } catch (error) {
     console.error(
@@ -118,19 +114,13 @@ export const unseenUserLicensePlate = async (id) => {
   }
 };
 
-export const batchUpdateUserLicensePlates = async (
-  userSelections,
-  location
-) => {
+export const batchUpdateUserLicensePlates = async (userSelections) => {
   try {
     // Convert userSelections object to FormData
     const formData = new FormData();
     for (const [key, value] of Object.entries(userSelections)) {
       formData.append(`userSelections[${key}]`, JSON.stringify(value));
     }
-
-    // Add location to FormData
-    formData.append("location", location);
 
     const response = await api.post(
       `/user/license-plates/batch-update`,

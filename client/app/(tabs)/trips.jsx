@@ -68,7 +68,7 @@ const Trips = () => {
   };
 
   const handleCreateTrip = async () => {
-    const placeholderTime = "00:00:00";
+    const placeholderTime = "0:00:00:00";
     const placeholderDateTime = "1970-01-01T00:00:00Z";
 
     const tripData = {
